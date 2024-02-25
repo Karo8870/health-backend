@@ -1,1 +1,27 @@
 - [X] Users can create accounts with unique usernames and passwords.
+- [ ] Profile settings include options to input dietary preferences and allergens.
+- [X] Users can update and customize their profiles at any time.
+- [ ] The app stores user data securely and complies with data protection regulations.
+- [ ] Users can add product details, including brand, product name, weight, nutritional facts, and price.
+- [ ] Submission form ensures data completeness and accuracy.
+- [ ] Collaborative section allows users to share experiences and opinions on products.
+- [ ] Users can edit or delete their own submissions until approved.
+- [ ] App calculates health ratings based on user reviews and nutritional information.
+- [ ] Users can upvote or downvote products to influence the overall rating.
+- [ ] Dynamic ranking system updates in real-time based on user feedback.
+- [ ] Clear visual representation of product ratings.
+- [ ] App analyzes nutritional content in the user's basket.
+- [ ] Provides personalized suggestions for complementary items.
+- [ ] Takes into account user's dietary preferences and allergens.
+- [ ] An administrative dashboard for reviewing user submissions.
+- [ ] Auto-validation system for repeated submissions with identical nutritional values.
+- [ ] Ensure data accuracy and consistency.
+- [ ] Utilizes the Open Food Facts database API for base product information.
+- [ ] Ensures accuracy and completeness of nutritional data.
+- [ ] Interactive platform for users to exchange insights, recommendations, and success stories.
+- [ ] Notifications for users to engage with community discussions.
+- [ ] Community guidelines to promote positive and constructive interactions.
+- [ ] SSL encryption for secure data transmission.
+- [ ] Strict data access controls to protect user information.
+
+# For base data: openfoodfac-ts

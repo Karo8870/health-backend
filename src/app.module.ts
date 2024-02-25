@@ -6,6 +6,9 @@ import { ClsModule } from 'nestjs-cls';
 import { ProfileModule } from './routes/profile/profile.module';
 import { AuthGuard } from './routes/auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { ProductModule } from './routes/product/product.module';
+import { ReviewModule } from './routes/review/review.module';
+import { SubmissionModule } from './routes/submission/submission.module';
 
 @Module({
 	imports: [
@@ -27,7 +30,10 @@ import { APP_GUARD } from '@nestjs/core';
 			}
 		}),
 		AuthModule,
-		ProfileModule
+		ProfileModule,
+		ProductModule,
+		ReviewModule,
+		SubmissionModule
 	],
 	providers: [
 		{

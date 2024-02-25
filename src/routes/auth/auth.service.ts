@@ -43,7 +43,10 @@ export class AuthService {
 
 	async register(registerDto: RegisterDto): Promise<any> {
 		await this.db.insert(users).values({
-			...registerDto,
+			firstName: registerDto.firstName,
+			lastName: registerDto.lastName,
+			user: registerDto.user,
+			email: registerDto.email,
 			password: await hash(registerDto.password, 10)
 		});
 	}
