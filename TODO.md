@@ -1,0 +1,1 @@
+- [X] Users can create accounts with unique usernames and passwords.
