@@ -29,6 +29,20 @@
       "when": 1708855840549,
       "tag": "0003_harsh_earthquake",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1708882382482,
+      "tag": "0004_fast_spacker_dave",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1708888032013,
+      "tag": "0005_bizarre_ronan",
+      "breakpoints": true
     }
   ]
 }

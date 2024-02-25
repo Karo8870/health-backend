@@ -9,6 +9,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ProductModule } from './routes/product/product.module';
 import { ReviewModule } from './routes/review/review.module';
 import { SubmissionModule } from './routes/submission/submission.module';
+import { db_url } from './core/constants';
 
 @Module({
 	imports: [
@@ -17,8 +18,7 @@ import { SubmissionModule } from './routes/submission/submission.module';
 			pg: {
 				connection: 'client',
 				config: {
-					connectionString:
-						'postgresql://postgres:test12345@localhost:5432/fiicode'
+					connectionString: db_url
 				}
 			},
 			config: { schema: { ...schema } }

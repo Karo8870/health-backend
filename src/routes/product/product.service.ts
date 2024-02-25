@@ -1,26 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../../drizzle/schema';
+import { products } from '../../drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class ProductService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
-  }
+	constructor(@Inject('DB') private db: NodePgDatabase<typeof schema>) {}
 
-  findAll() {
-    return `This action returns all product`;
-  }
+	create(createProductDto: CreateProductDto) {
+		return this.db.insert(products).values({
+			ean: createProductDto.ean
+		});
+	}
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
-  }
-
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} product`;
-  }
+	findOne(ean: string) {
+		return this.db.query.products.findFirst({
+			where: eq(products.ean, ean)
+		});
+	}
 }

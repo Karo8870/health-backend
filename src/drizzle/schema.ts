@@ -3,7 +3,7 @@ import {
 	integer,
 	jsonb,
 	pgTable,
-	serial,
+	serial, smallint,
 	text,
 	varchar
 } from 'drizzle-orm/pg-core';
@@ -33,7 +33,7 @@ export const preferences = pgTable('Restriction', {
 
 export const products = pgTable('Product', {
 	id: serial('id').primaryKey(),
-	ean: integer('ean'),
+	ean: varchar('ean'),
 	upVotes: integer('upVotes'),
 	downVotes: integer('downVotes')
 });
@@ -51,7 +51,7 @@ export const productDetails = pgTable('ProductDetails', {
 export const reviews = pgTable('Review', {
 	id: serial('id').primaryKey(),
 	body: text('body'),
-	value: integer('value'),
+	value: smallint('value'),
 	authorID: integer('authorID')
 });
 
@@ -66,7 +66,8 @@ export const submissions = pgTable('Submission', {
 	id: serial('id').primaryKey(),
 	body: jsonb('body'),
 	authorID: integer('authorID'),
-	status: varchar('status', { enum: ['pending', 'approved', 'rejected'] })
+	status: varchar('status', { enum: ['pending', 'approved', 'rejected'] }),
+	ean: varchar('ean')
 });
 
 export const submissionsRelations = relations(submissions, ({ one }) => ({
