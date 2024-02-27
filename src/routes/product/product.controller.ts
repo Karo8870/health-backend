@@ -1,20 +1,23 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { AdminGuard } from '../auth/admin.guard';
+import { ReviewPostDto } from '../post/dto/review-post.dto';
 
 @Controller('product')
 export class ProductController {
 	constructor(private readonly productService: ProductService) {}
 
-	@UseGuards(AdminGuard)
-	@Post()
-	create(@Body() createProductDto: CreateProductDto) {
-		return this.productService.create(createProductDto);
+	@Post('review/:ean')
+	review(@Param('ean') id: string, @Body() reviewPostDto: ReviewPostDto) {
+		return this.productService.review(+id, reviewPostDto);
 	}
 
 	@Get(':ean')
 	findOne(@Param('ean') ean: string) {
-		return this.productService.findOne(ean);
+		return this.productService.findOne(+ean);
+	}
+
+	@Delete('review/:ean')
+	deleteReview(@Param('ean') id: string) {
+		return this.productService.deleteReview(+id);
 	}
 }

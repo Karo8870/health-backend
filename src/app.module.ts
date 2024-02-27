@@ -7,9 +7,10 @@ import { ProfileModule } from './routes/profile/profile.module';
 import { AuthGuard } from './routes/auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { ProductModule } from './routes/product/product.module';
-import { ReviewModule } from './routes/review/review.module';
+import { PostModule } from './routes/post/post.module';
 import { SubmissionModule } from './routes/submission/submission.module';
 import { db_url } from './core/constants';
+import { CommentModule } from './routes/comment/comment.module';
 
 @Module({
 	imports: [
@@ -32,8 +33,9 @@ import { db_url } from './core/constants';
 		AuthModule,
 		ProfileModule,
 		ProductModule,
-		ReviewModule,
-		SubmissionModule
+		PostModule,
+		SubmissionModule,
+		CommentModule
 	],
 	providers: [
 		{

@@ -1,4 +1,10 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+	ConflictException,
+	Inject,
+	Injectable,
+	InternalServerErrorException,
+	UnauthorizedException
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -42,13 +48,21 @@ export class AuthService {
 	}
 
 	async register(registerDto: RegisterDto): Promise<any> {
-		await this.db.insert(users).values({
-			firstName: registerDto.firstName,
-			lastName: registerDto.lastName,
-			user: registerDto.user,
-			email: registerDto.email,
-			password: await hash(registerDto.password, 10)
-		});
+		try {
+			await this.db.insert(users).values({
+				firstName: registerDto.firstName,
+				lastName: registerDto.lastName,
+				user: registerDto.user,
+				email: registerDto.email,
+				password: await hash(registerDto.password, 10)
+			});
+		} catch (e) {
+			if (e.code === '23505') {
+				throw new ConflictException(e.detail);
+			}
+
+			throw new InternalServerErrorException();
+		}
 	}
 
 	async deleteAccount(): Promise<any> {

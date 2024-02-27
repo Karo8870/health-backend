@@ -18,7 +18,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "gen": "npx drizzle-kit generate:pg",
-    "push": "node src/drizzle/migrate.js"
+    "push": "node src/drizzle/migrate.js",
+    "ssl": "mkdir ssl && openssl genpkey -algorithm RSA -out ssl/server.key && openssl req -x509 -days 365 -key ssl/server.key -out ssl/server.cert"
   },
   "dependencies": {
     "@knaadh/nestjs-drizzle-pg": "^1.0.0",

@@ -1,10 +1,12 @@
 import {
+	bigint,
 	boolean,
 	integer,
 	jsonb,
 	pgTable,
-	serial, smallint,
+	serial,
 	text,
+	timestamp,
 	varchar
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
@@ -21,8 +23,11 @@ export const users = pgTable('User', {
 
 export const usersRelations = relations(users, ({ one, many }) => ({
 	preferences: one(preferences),
-	reviews: many(reviews),
-	submissions: many(submissions)
+	reviews: many(posts),
+	submissions: many(submissions),
+	comments: many(comments),
+	productReviews: many(productReviews),
+	postReviews: many(postReviews)
 }));
 
 export const preferences = pgTable('Restriction', {
@@ -31,48 +36,52 @@ export const preferences = pgTable('Restriction', {
 	data: jsonb('data')
 });
 
-export const products = pgTable('Product', {
-	id: serial('id').primaryKey(),
-	ean: varchar('ean'),
-	upVotes: integer('upVotes'),
-	downVotes: integer('downVotes')
-});
-
-export const productsRelations = relations(products, ({ one }) => ({
-	details: one(productDetails)
-}));
-
 export const productDetails = pgTable('ProductDetails', {
 	id: serial('id').primaryKey(),
-	productID: integer('productID').references(() => products.id),
-	details: jsonb('details')
+	ean: bigint('ean', { mode: 'number' }).unique(),
+	data: jsonb('data')
 });
 
-export const reviews = pgTable('Review', {
+export const productReviews = pgTable('ProductReview', {
+	id: serial('id').primaryKey(),
+	like: boolean('like'),
+	userID: integer('userID').references(() => users.id),
+	productEAN: bigint('productEAN', { mode: 'number' })
+});
+
+export const posts = pgTable('Post', {
 	id: serial('id').primaryKey(),
 	body: text('body'),
-	value: smallint('value'),
-	authorID: integer('authorID')
+	date: timestamp('date').defaultNow(),
+	productEAN: bigint('productEAN', { mode: 'number' }),
+	authorID: integer('authorID').references(() => users.id)
 });
 
-export const reviewsRelations = relations(reviews, ({ one }) => ({
-	author: one(users, {
-		fields: [reviews.authorID],
-		references: [users.id]
-	})
+export const postReviews = pgTable('PostReview', {
+	id: serial('id').primaryKey(),
+	like: boolean('like'),
+	userID: integer('userID').references(() => users.id),
+	postID: integer('postID').references(() => posts.id)
+});
+
+export const postsRelations = relations(posts, ({ many }) => ({
+	comments: many(comments),
+	reviews: many(postReviews)
 }));
+
+export const comments = pgTable('Comment', {
+	id: serial('id').primaryKey(),
+	body: text('body'),
+	date: timestamp('date').defaultNow(),
+	postID: integer('postID').references(() => posts.id),
+	authorID: integer('authorID').references(() => users.id)
+});
 
 export const submissions = pgTable('Submission', {
 	id: serial('id').primaryKey(),
 	body: jsonb('body'),
-	authorID: integer('authorID'),
-	status: varchar('status', { enum: ['pending', 'approved', 'rejected'] }),
-	ean: varchar('ean')
+	status: varchar('status', { enum: ['pending', 'processed'] }),
+	date: timestamp('date').defaultNow(),
+	productEAN: bigint('productEAN', { mode: 'number' }),
+	authorID: integer('authorID').references(() => users.id)
 });
-
-export const submissionsRelations = relations(submissions, ({ one }) => ({
-	author: one(users, {
-		fields: [submissions.authorID],
-		references: [users.id]
-	})
-}));

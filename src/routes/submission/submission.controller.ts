@@ -1,34 +1,66 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	Param,
+	Patch,
+	Post,
+	UseGuards
+} from '@nestjs/common';
 import { SubmissionService } from './submission.service';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { UpdateSubmissionDto } from './dto/update-submission.dto';
+import { AdminGuard } from '../auth/admin.guard';
+import { ValidateSubmissionsDto } from './dto/validate-submissions.dto';
 
 @Controller('submission')
 export class SubmissionController {
-  constructor(private readonly submissionService: SubmissionService) {}
+	constructor(private readonly submissionService: SubmissionService) {}
 
-  @Post()
-  create(@Body() createSubmissionDto: CreateSubmissionDto) {
-    return this.submissionService.create(createSubmissionDto);
-  }
+	@Post()
+	create(@Body() createSubmissionDto: CreateSubmissionDto) {
+		return this.submissionService.create(createSubmissionDto);
+	}
 
-  @Get()
-  findAll() {
-    return this.submissionService.findAll();
-  }
+	@Get()
+	findOwn() {
+		return this.submissionService.findOwn();
+	}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.submissionService.findOne(+id);
-  }
+	@Get('products')
+	@UseGuards(AdminGuard)
+	findAll() {
+		return this.submissionService.findAll();
+	}
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubmissionDto: UpdateSubmissionDto) {
-    return this.submissionService.update(+id, updateSubmissionDto);
-  }
+	@Get(':id')
+	findOne(@Param('id') id: string) {
+		return this.submissionService.findOne(+id);
+	}
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.submissionService.remove(+id);
-  }
+	@Get(':ean')
+	@UseGuards(AdminGuard)
+	findAllByProduct(@Param('ean') ean: string) {
+		return this.submissionService.findAllByProduct(+ean);
+	}
+
+	@Patch(':id')
+	update(
+		@Param('id') id: string,
+		@Body() updateSubmissionDto: UpdateSubmissionDto
+	) {
+		return this.submissionService.update(+id, updateSubmissionDto);
+	}
+
+	@Patch('validate')
+	@UseGuards(AdminGuard)
+	validate(@Body() validateSubmissionsDto: ValidateSubmissionsDto) {
+		return this.submissionService.validate(validateSubmissionsDto);
+	}
+
+	@Delete(':id')
+	remove(@Param('id') id: string) {
+		return this.submissionService.remove(+id);
+	}
 }
