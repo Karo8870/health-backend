@@ -11,7 +11,7 @@ import { RegisterDto } from './dto/register.dto';
 import { compare, hash } from 'bcrypt';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../drizzle/schema';
-import { users } from '../../drizzle/schema';
+import { preferences, users } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { ClsService } from 'nestjs-cls';
 import { AuthClsStore } from './auth.guard';
@@ -32,7 +32,9 @@ export class AuthService {
 
 	async signIn(signInDto: SignInDto): Promise<JWTTokenResponse> {
 		const user = await this.db.query.users.findFirst({
-			where: eq(users.email, signInDto.email)
+			where: signInDto.email
+				? eq(users.email, signInDto.email)
+				: eq(users.user, signInDto.user)
 		});
 
 		if (!user || !(await compare(signInDto.password, user.password))) {
@@ -49,12 +51,21 @@ export class AuthService {
 
 	async register(registerDto: RegisterDto): Promise<any> {
 		try {
-			await this.db.insert(users).values({
-				firstName: registerDto.firstName,
-				lastName: registerDto.lastName,
-				user: registerDto.user,
-				email: registerDto.email,
-				password: await hash(registerDto.password, 10)
+			const [user] = await this.db
+				.insert(users)
+				.values({
+					firstName: registerDto.firstName,
+					lastName: registerDto.lastName,
+					user: registerDto.user,
+					email: registerDto.email,
+					password: await hash(registerDto.password, 10)
+				})
+				.returning({
+					id: users.id
+				});
+
+			await this.db.insert(preferences).values({
+				userID: user.id
 			});
 		} catch (e) {
 			if (e.code === '23505') {
@@ -66,7 +77,7 @@ export class AuthService {
 	}
 
 	async deleteAccount(): Promise<any> {
-		return this.db.delete(users).where(eq(users.id, this.cls.get('userID')));
+		await this.db.delete(users).where(eq(users.id, this.cls.get('userID')));
 	}
 
 	async updateCredentials(

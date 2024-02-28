@@ -33,10 +33,12 @@ export class SubmissionService {
 	}
 
 	async findAll() {
-		return this.db
-			.selectDistinctOn([submissions.productEAN])
-			.from(submissions)
-			.where(eq(submissions.status, 'pending'));
+		return (
+			await this.db
+				.selectDistinctOn([submissions.productEAN], { ean: submissions.productEAN })
+				.from(submissions)
+				.where(eq(submissions.status, 'pending'))
+		).map((el) => el.ean);
 	}
 
 	async findOne(id: number) {
@@ -48,7 +50,7 @@ export class SubmissionService {
 		});
 	}
 
-	async findAllByProduct(ean: number) {
+	async findAllByProduct(ean: string) {
 		return this.db.query.submissions.findMany({
 			where: and(
 				eq(submissions.productEAN, ean),

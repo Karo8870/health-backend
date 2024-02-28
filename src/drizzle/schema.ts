@@ -1,5 +1,4 @@
 import {
-	bigint,
 	boolean,
 	integer,
 	jsonb,
@@ -7,6 +6,7 @@ import {
 	serial,
 	text,
 	timestamp,
+	unique,
 	varchar
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
@@ -32,37 +32,57 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 
 export const preferences = pgTable('Restriction', {
 	id: serial('id').primaryKey(),
-	userID: integer('userID').references(() => users.id),
+	userID: integer('userID').references(() => users.id, { onDelete: 'cascade' }),
 	data: jsonb('data')
 });
 
 export const productDetails = pgTable('ProductDetails', {
 	id: serial('id').primaryKey(),
-	ean: bigint('ean', { mode: 'number' }).unique(),
+	ean: varchar('ean', { length: 15 }).unique(),
 	data: jsonb('data')
 });
 
-export const productReviews = pgTable('ProductReview', {
-	id: serial('id').primaryKey(),
-	like: boolean('like'),
-	userID: integer('userID').references(() => users.id),
-	productEAN: bigint('productEAN', { mode: 'number' })
-});
+export const productReviews = pgTable(
+	'ProductReview',
+	{
+		id: serial('id').primaryKey(),
+		like: boolean('like'),
+		userID: integer('userID').references(() => users.id, {
+			onDelete: 'cascade'
+		}),
+		productEAN: varchar('productEAN', { length: 15 })
+	},
+	(table) => ({
+		unq: unique().on(table.userID, table.productEAN)
+	})
+);
 
 export const posts = pgTable('Post', {
 	id: serial('id').primaryKey(),
 	body: text('body'),
 	date: timestamp('date').defaultNow(),
-	productEAN: bigint('productEAN', { mode: 'number' }),
-	authorID: integer('authorID').references(() => users.id)
+	productEAN: varchar('productEAN', { length: 15 }),
+	authorID: integer('authorID').references(() => users.id, {
+		onDelete: 'cascade'
+	})
 });
 
-export const postReviews = pgTable('PostReview', {
-	id: serial('id').primaryKey(),
-	like: boolean('like'),
-	userID: integer('userID').references(() => users.id),
-	postID: integer('postID').references(() => posts.id)
-});
+export const postReviews = pgTable(
+	'PostReview',
+	{
+		id: serial('id').primaryKey(),
+		like: boolean('like'),
+		userID: integer('userID').references(() => users.id, {
+			onDelete: 'cascade'
+		}),
+		postID: integer('postID').references(() => posts.id, {
+			onDelete: 'cascade'
+		})
+	},
+	(table) => ({
+		unq: unique().on(table.userID, table.postID)
+	})
+);
 
 export const postsRelations = relations(posts, ({ many }) => ({
 	comments: many(comments),
@@ -73,8 +93,10 @@ export const comments = pgTable('Comment', {
 	id: serial('id').primaryKey(),
 	body: text('body'),
 	date: timestamp('date').defaultNow(),
-	postID: integer('postID').references(() => posts.id),
-	authorID: integer('authorID').references(() => users.id)
+	postID: integer('postID').references(() => posts.id, { onDelete: 'cascade' }),
+	authorID: integer('authorID').references(() => users.id, {
+		onDelete: 'cascade'
+	})
 });
 
 export const submissions = pgTable('Submission', {
@@ -82,6 +104,8 @@ export const submissions = pgTable('Submission', {
 	body: jsonb('body'),
 	status: varchar('status', { enum: ['pending', 'processed'] }),
 	date: timestamp('date').defaultNow(),
-	productEAN: bigint('productEAN', { mode: 'number' }),
-	authorID: integer('authorID').references(() => users.id)
+	productEAN: varchar('productEAN', { length: 15 }),
+	authorID: integer('authorID').references(() => users.id, {
+		onDelete: 'cascade'
+	})
 });

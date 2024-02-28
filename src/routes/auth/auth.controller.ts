@@ -32,7 +32,7 @@ export class AuthController {
 		return this.authService.updateCredentials(updateCredentialsDto);
 	}
 
-	@Patch()
+	@Patch('password')
 	updatePassword(@Body() updatePasswordDto: UpdatePasswordDto) {
 		return this.authService.updatePassword(updatePasswordDto);
 	}

@@ -7,17 +7,17 @@ export class ProductController {
 	constructor(private readonly productService: ProductService) {}
 
 	@Post('review/:ean')
-	review(@Param('ean') id: string, @Body() reviewPostDto: ReviewPostDto) {
-		return this.productService.review(+id, reviewPostDto);
+	review(@Param('ean') ean: string, @Body() reviewPostDto: ReviewPostDto) {
+		return this.productService.review(ean, reviewPostDto);
 	}
 
 	@Get(':ean')
 	findOne(@Param('ean') ean: string) {
-		return this.productService.findOne(+ean);
+		return this.productService.findOne(ean);
 	}
 
 	@Delete('review/:ean')
-	deleteReview(@Param('ean') id: string) {
-		return this.productService.deleteReview(+id);
+	deleteReview(@Param('ean') ean: string) {
+		return this.productService.deleteReview(ean);
 	}
 }

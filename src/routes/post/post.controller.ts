@@ -26,14 +26,14 @@ export class PostController {
 		return this.postService.review(+id, reviewPostDto);
 	}
 
+	@Get('product/:ean')
+	findMany(@Param('ean') ean: string) {
+		return this.postService.findMany(ean);
+	}
+
 	@Get(':id')
 	findOne(@Param('id') id: string) {
 		return this.postService.findOne(+id);
-	}
-
-	@Get('product/:ean')
-	findMany(@Param('ean') ean: string) {
-		return this.postService.findMany(+ean);
 	}
 
 	@Patch(':id')
@@ -41,13 +41,13 @@ export class PostController {
 		return this.postService.update(+id, updateReviewDto);
 	}
 
-	@Delete(':id')
-	remove(@Param('id') id: string) {
-		return this.postService.remove(+id);
-	}
-
 	@Delete('review/:id')
 	deleteReview(@Param('id') id: string) {
 		return this.postService.deleteReview(+id);
+	}
+
+	@Delete(':id')
+	remove(@Param('id') id: string) {
+		return this.postService.remove(+id);
 	}
 }

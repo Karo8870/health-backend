@@ -7,17 +7,18 @@ CREATE TABLE IF NOT EXISTS "Comment" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "PostReview" (
+	"id" serial PRIMARY KEY NOT NULL,
 	"like" boolean,
 	"userID" integer,
 	"postID" integer,
-	CONSTRAINT "PostReview_userID_postID_pk" PRIMARY KEY("userID","postID")
+	CONSTRAINT "PostReview_userID_postID_unique" UNIQUE("userID","postID")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "Post" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"body" text,
 	"date" timestamp DEFAULT now(),
-	"productEAN" bigint,
+	"productEAN" varchar(15),
 	"authorID" integer
 );
 --> statement-breakpoint
@@ -29,16 +30,17 @@ CREATE TABLE IF NOT EXISTS "Restriction" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "ProductDetails" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"ean" bigint,
-	"details" jsonb,
+	"ean" varchar(15),
+	"data" jsonb,
 	CONSTRAINT "ProductDetails_ean_unique" UNIQUE("ean")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "ProductReview" (
+	"id" serial PRIMARY KEY NOT NULL,
 	"like" boolean,
 	"userID" integer,
-	"productEAN" bigint,
-	CONSTRAINT "ProductReview_userID_productEAN_pk" PRIMARY KEY("userID","productEAN")
+	"productEAN" varchar(15),
+	CONSTRAINT "ProductReview_userID_productEAN_unique" UNIQUE("userID","productEAN")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "Submission" (
@@ -46,7 +48,7 @@ CREATE TABLE IF NOT EXISTS "Submission" (
 	"body" jsonb,
 	"status" varchar,
 	"date" timestamp DEFAULT now(),
-	"productEAN" bigint,
+	"productEAN" varchar(15),
 	"authorID" integer
 );
 --> statement-breakpoint
@@ -63,49 +65,49 @@ CREATE TABLE IF NOT EXISTS "User" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "Comment" ADD CONSTRAINT "Comment_postID_Post_id_fk" FOREIGN KEY ("postID") REFERENCES "Post"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "Comment" ADD CONSTRAINT "Comment_postID_Post_id_fk" FOREIGN KEY ("postID") REFERENCES "Post"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "Comment" ADD CONSTRAINT "Comment_authorID_User_id_fk" FOREIGN KEY ("authorID") REFERENCES "User"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "Comment" ADD CONSTRAINT "Comment_authorID_User_id_fk" FOREIGN KEY ("authorID") REFERENCES "User"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "PostReview" ADD CONSTRAINT "PostReview_userID_User_id_fk" FOREIGN KEY ("userID") REFERENCES "User"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "PostReview" ADD CONSTRAINT "PostReview_userID_User_id_fk" FOREIGN KEY ("userID") REFERENCES "User"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "PostReview" ADD CONSTRAINT "PostReview_postID_Post_id_fk" FOREIGN KEY ("postID") REFERENCES "Post"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "PostReview" ADD CONSTRAINT "PostReview_postID_Post_id_fk" FOREIGN KEY ("postID") REFERENCES "Post"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "Post" ADD CONSTRAINT "Post_authorID_User_id_fk" FOREIGN KEY ("authorID") REFERENCES "User"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "Post" ADD CONSTRAINT "Post_authorID_User_id_fk" FOREIGN KEY ("authorID") REFERENCES "User"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "Restriction" ADD CONSTRAINT "Restriction_userID_User_id_fk" FOREIGN KEY ("userID") REFERENCES "User"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "Restriction" ADD CONSTRAINT "Restriction_userID_User_id_fk" FOREIGN KEY ("userID") REFERENCES "User"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "ProductReview" ADD CONSTRAINT "ProductReview_userID_User_id_fk" FOREIGN KEY ("userID") REFERENCES "User"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "ProductReview" ADD CONSTRAINT "ProductReview_userID_User_id_fk" FOREIGN KEY ("userID") REFERENCES "User"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "Submission" ADD CONSTRAINT "Submission_authorID_User_id_fk" FOREIGN KEY ("authorID") REFERENCES "User"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "Submission" ADD CONSTRAINT "Submission_authorID_User_id_fk" FOREIGN KEY ("authorID") REFERENCES "User"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

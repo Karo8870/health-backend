@@ -16,10 +16,11 @@ export class PostService {
 		private cls: ClsService<AuthClsStore>
 	) {}
 
-	async create(createReviewDto: CreatePostDto) {
-		return this.db.insert(posts).values({
+	async create(createPostDto: CreatePostDto) {
+		await this.db.insert(posts).values({
 			authorID: this.cls.get('userID'),
-			body: createReviewDto.body
+			body: createPostDto.body,
+			productEAN: createPostDto.ean
 		});
 	}
 
@@ -32,41 +33,48 @@ export class PostService {
 				like: reviewPostDto.like
 			})
 			.onConflictDoUpdate({
+				target: [postReviews.userID, postReviews.postID],
 				set: {
 					like: reviewPostDto.like
-				},
-				target: [postReviews.id]
+				}
 			});
 	}
 
 	async findOne(id: number) {
-		return this.db
-			.select({
-				body: posts.body,
-				id: posts.id,
-				likes: count(eq(postReviews.like, true)),
-				dislikes: count(eq(postReviews.like, false))
-			})
-			.from(posts)
-			.where(eq(posts.id, id))
-			.leftJoin(postReviews, eq(postReviews.postID, posts.id));
+		return {
+			body: (await this.db.select().from(posts).where(eq(posts.id, id)))[0],
+			...(
+				await this.db
+					.select({
+						likes: count()
+					})
+					.from(postReviews)
+					.where(and(eq(postReviews.postID, id), eq(postReviews.like, true)))
+			)[0],
+			...(
+				await this.db
+					.select({
+						dislikes: count()
+					})
+					.from(postReviews)
+					.where(and(eq(postReviews.postID, id), eq(postReviews.like, false)))
+			)[0]
+		};
 	}
 
-	async findMany(ean: number) {
-		return this.db
-			.select({
-				body: posts.body,
-				id: posts.id,
-				likes: count(eq(postReviews.like, true)),
-				dislikes: count(eq(postReviews.like, false))
-			})
-			.from(posts)
-			.where(eq(posts.productEAN, ean))
-			.leftJoin(postReviews, eq(postReviews.postID, posts.id));
+	async findMany(ean: string) {
+		return (
+			await this.db
+				.select({
+					id: posts.id
+				})
+				.from(posts)
+				.where(eq(posts.productEAN, ean))
+		).map((el) => el.id);
 	}
 
 	async update(id: number, updateReviewDto: UpdatePostDto) {
-		return this.db
+		await this.db
 			.update(posts)
 			.set({
 				body: updateReviewDto.body
@@ -75,7 +83,7 @@ export class PostService {
 	}
 
 	async remove(id: number) {
-		return this.db
+		await this.db
 			.delete(posts)
 			.where(and(eq(posts.id, id), eq(posts.authorID, this.cls.get('userID'))));
 	}

@@ -34,15 +34,21 @@ export class SubmissionController {
 		return this.submissionService.findAll();
 	}
 
+	@Get('products/:ean')
+	@UseGuards(AdminGuard)
+	findAllByProduct(@Param('ean') ean: string) {
+		return this.submissionService.findAllByProduct(ean);
+	}
+
 	@Get(':id')
 	findOne(@Param('id') id: string) {
 		return this.submissionService.findOne(+id);
 	}
 
-	@Get(':ean')
+	@Patch('validate')
 	@UseGuards(AdminGuard)
-	findAllByProduct(@Param('ean') ean: string) {
-		return this.submissionService.findAllByProduct(+ean);
+	validate(@Body() validateSubmissionsDto: ValidateSubmissionsDto) {
+		return this.submissionService.validate(validateSubmissionsDto);
 	}
 
 	@Patch(':id')
@@ -51,12 +57,6 @@ export class SubmissionController {
 		@Body() updateSubmissionDto: UpdateSubmissionDto
 	) {
 		return this.submissionService.update(+id, updateSubmissionDto);
-	}
-
-	@Patch('validate')
-	@UseGuards(AdminGuard)
-	validate(@Body() validateSubmissionsDto: ValidateSubmissionsDto) {
-		return this.submissionService.validate(validateSubmissionsDto);
 	}
 
 	@Delete(':id')

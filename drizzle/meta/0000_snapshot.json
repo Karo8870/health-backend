@@ -1,5 +1,5 @@
 {
-  "id": "5d25a0d6-0aa1-4eab-afcd-b496d43cbf57",
+  "id": "18722cff-31e7-40f5-98c8-e2569f7f462c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -52,7 +52,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "Comment_authorID_User_id_fk": {
@@ -65,7 +65,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -76,6 +76,12 @@
       "name": "PostReview",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
         "like": {
           "name": "like",
           "type": "boolean",
@@ -107,7 +113,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "PostReview_postID_Post_id_fk": {
@@ -120,20 +126,21 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {
-        "PostReview_userID_postID_pk": {
-          "name": "PostReview_userID_postID_pk",
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "PostReview_userID_postID_unique": {
+          "name": "PostReview_userID_postID_unique",
+          "nullsNotDistinct": false,
           "columns": [
             "userID",
             "postID"
           ]
         }
-      },
-      "uniqueConstraints": {}
+      }
     },
     "Post": {
       "name": "Post",
@@ -160,7 +167,7 @@
         },
         "productEAN": {
           "name": "productEAN",
-          "type": "bigint",
+          "type": "varchar(15)",
           "primaryKey": false,
           "notNull": false
         },
@@ -183,7 +190,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -225,7 +232,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -244,12 +251,12 @@
         },
         "ean": {
           "name": "ean",
-          "type": "bigint",
+          "type": "varchar(15)",
           "primaryKey": false,
           "notNull": false
         },
-        "details": {
-          "name": "details",
+        "data": {
+          "name": "data",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false
@@ -272,6 +279,12 @@
       "name": "ProductReview",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
         "like": {
           "name": "like",
           "type": "boolean",
@@ -286,7 +299,7 @@
         },
         "productEAN": {
           "name": "productEAN",
-          "type": "bigint",
+          "type": "varchar(15)",
           "primaryKey": false,
           "notNull": false
         }
@@ -303,20 +316,21 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {
-        "ProductReview_userID_productEAN_pk": {
-          "name": "ProductReview_userID_productEAN_pk",
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ProductReview_userID_productEAN_unique": {
+          "name": "ProductReview_userID_productEAN_unique",
+          "nullsNotDistinct": false,
           "columns": [
             "userID",
             "productEAN"
           ]
         }
-      },
-      "uniqueConstraints": {}
+      }
     },
     "Submission": {
       "name": "Submission",
@@ -349,7 +363,7 @@
         },
         "productEAN": {
           "name": "productEAN",
-          "type": "bigint",
+          "type": "varchar(15)",
           "primaryKey": false,
           "notNull": false
         },
@@ -372,7 +386,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },

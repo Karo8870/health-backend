@@ -15,16 +15,16 @@ export class ProfileService {
 	) {}
 
 	async getProfile() {
-		return this.db
-			.select({
-				id: users.id,
-				user: users.user,
-				email: users.email,
-				firstName: users.firstName,
-				lastName: users.lastName
-			})
-			.from(users)
-			.where(eq(users.id, this.cls.get('userID')));
+		return this.db.query.users.findFirst({
+			where: eq(users.id, this.cls.get('userID')),
+			columns: {
+				id: true,
+				user: true,
+				email: true,
+				firstName: true,
+				lastName: true
+			}
+		});
 	}
 
 	async updatePreferences(updateProfileDto: UpdateProfileDto) {
@@ -33,6 +33,9 @@ export class ProfileService {
 			.set({
 				data: updateProfileDto.data
 			})
-			.where(eq(users.id, this.cls.get('userID')));
+			.where(eq(preferences.userID, this.cls.get('userID')))
+			.returning({
+				id: preferences.userID
+			});
 	}
 }

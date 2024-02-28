@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEAN, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePostDto {
@@ -8,7 +8,7 @@ export class CreatePostDto {
 	body: string;
 
 	@IsNotEmpty()
-	@IsString()
+	@IsEAN()
 	@ApiProperty()
 	ean: string;
 }
