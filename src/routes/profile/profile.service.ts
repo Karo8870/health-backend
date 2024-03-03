@@ -27,6 +27,15 @@ export class ProfileService {
 		});
 	}
 
+	async getPreferences() {
+		return this.db
+			.select({
+				data: preferences.data
+			})
+			.from(preferences)
+			.where(eq(preferences.userID, this.cls.get('userID')));
+	}
+
 	async updatePreferences(updateProfileDto: UpdateProfileDto) {
 		await this.db
 			.update(preferences)

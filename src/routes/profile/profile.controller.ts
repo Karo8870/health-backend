@@ -11,6 +11,11 @@ export class ProfileController {
 		return this.profileService.getProfile();
 	}
 
+	@Get('preferences')
+	getPreferences() {
+		return this.profileService.getPreferences();
+	}
+
 	@Patch()
 	updatePreferences(@Body() updateProfileDto: UpdateProfileDto) {
 		return this.profileService.updatePreferences(updateProfileDto);
