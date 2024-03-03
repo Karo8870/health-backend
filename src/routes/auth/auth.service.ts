@@ -41,6 +41,8 @@ export class AuthService {
 			throw new UnauthorizedException();
 		}
 
+		console.log(user)
+
 		return {
 			access_token: await this.jwtService.signAsync({
 				id: user.id,

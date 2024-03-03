@@ -17,21 +17,27 @@ export class PostService {
 	) {}
 
 	async create(createPostDto: CreatePostDto) {
-		const [{ id }] = await this.db
-			.insert(posts)
-			.values({
-				authorID: this.cls.get('userID'),
-				productEAN: createPostDto.ean,
-				title: createPostDto.title
-			})
-			.returning({
-				id: posts.id
-			});
+		console.log(this.cls.get('userID'));
 
-		await this.db.insert(postContents).values({
-			postID: id,
-			content: createPostDto.content
-		});
+		try {
+			const [{ id }] = await this.db
+				.insert(posts)
+				.values({
+					authorID: this.cls.get('userID'),
+					productEAN: createPostDto.ean,
+					title: createPostDto.title
+				})
+				.returning({
+					id: posts.id
+				});
+
+			await this.db.insert(postContents).values({
+				postID: id,
+				content: createPostDto.content
+			});
+		} catch (e) {
+			console.log(e.detail);
+		}
 	}
 
 	async review(id: number, reviewPostDto: ReviewPostDto) {
@@ -56,7 +62,17 @@ export class PostService {
 				where: eq(posts.id, id),
 				with: {
 					content: true,
-					comments: true
+					reviews: true,
+					comments: true,
+					author: {
+						columns: {
+							id: true,
+							email: true,
+							firstName: true,
+							lastName: true,
+							user: true
+						}
+					}
 				}
 			}),
 			...(
@@ -83,7 +99,17 @@ export class PostService {
 			where: eq(posts.productEAN, ean),
 			with: {
 				content: true,
-				reviews: true
+				reviews: true,
+				comments: true,
+				author: {
+					columns: {
+						id: true,
+						email: true,
+						firstName: true,
+						lastName: true,
+						user: true
+					}
+				}
 			}
 		});
 	}
@@ -93,7 +119,37 @@ export class PostService {
 			where: isNull(posts.productEAN),
 			with: {
 				content: true,
-				reviews: true
+				reviews: true,
+				comments: true,
+				author: {
+					columns: {
+						id: true,
+						email: true,
+						firstName: true,
+						lastName: true,
+						user: true
+					}
+				}
+			}
+		});
+	}
+
+	async findOwn() {
+		return this.db.query.posts.findMany({
+			where: eq(posts.authorID, this.cls.get('userID')),
+			with: {
+				content: true,
+				reviews: true,
+				comments: true,
+				author: {
+					columns: {
+						id: true,
+						email: true,
+						firstName: true,
+						lastName: true,
+						user: true
+					}
+				}
 			}
 		});
 	}

@@ -27,7 +27,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	submissions: many(submissions),
 	comments: many(comments),
 	productReviews: many(productReviews),
-	postReviews: many(postReviews)
+	postReviews: many(postReviews),
+	posts: many(posts, {
+		relationName: 'ownPosts'
+	})
 }));
 
 export const preferences = pgTable('Restriction', {
@@ -106,6 +109,11 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 	content: one(postContents, {
 		fields: [posts.id],
 		references: [postContents.postID]
+	}),
+	author: one(users, {
+		relationName: 'ownPosts',
+		fields: [posts.authorID],
+		references: [users.id]
 	})
 }));
 

@@ -41,6 +41,11 @@ export class PostController {
 		return this.postService.findOne(+id);
 	}
 
+	@Get()
+	findOwn() {
+		return this.postService.findOwn();
+	}
+
 	@Patch(':id')
 	update(@Param('id') id: string, @Body() updateReviewDto: UpdatePostDto) {
 		return this.postService.update(+id, updateReviewDto);
