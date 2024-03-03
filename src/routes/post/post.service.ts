@@ -63,7 +63,11 @@ export class PostService {
 				with: {
 					content: true,
 					reviews: true,
-					comments: true,
+					comments: {
+						with: {
+							author: true
+						}
+					},
 					author: {
 						columns: {
 							id: true,
@@ -100,7 +104,11 @@ export class PostService {
 			with: {
 				content: true,
 				reviews: true,
-				comments: true,
+				comments: {
+					with: {
+						author: true
+					}
+				},
 				author: {
 					columns: {
 						id: true,
@@ -120,7 +128,11 @@ export class PostService {
 			with: {
 				content: true,
 				reviews: true,
-				comments: true,
+				comments: {
+					with: {
+						author: true
+					}
+				},
 				author: {
 					columns: {
 						id: true,
@@ -140,7 +152,11 @@ export class PostService {
 			with: {
 				content: true,
 				reviews: true,
-				comments: true,
+				comments: {
+					with: {
+						author: true
+					}
+				},
 				author: {
 					columns: {
 						id: true,
