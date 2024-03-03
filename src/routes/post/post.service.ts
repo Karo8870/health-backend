@@ -79,23 +79,23 @@ export class PostService {
 	}
 
 	async findMany(ean: string) {
-		return this.db
-			.select({
-				id: posts.id,
-				title: posts.title
-			})
-			.from(posts)
-			.where(eq(posts.productEAN, ean));
+		return this.db.query.posts.findMany({
+			where: eq(posts.productEAN, ean),
+			with: {
+				content: true,
+				reviews: true
+			}
+		});
 	}
 
 	async findGeneral() {
-		return this.db
-			.select({
-				id: posts.id,
-				title: posts.title
-			})
-			.from(posts)
-			.where(isNull(posts.productEAN));
+		return this.db.query.posts.findMany({
+			where: isNull(posts.productEAN),
+			with: {
+				content: true,
+				reviews: true
+			}
+		});
 	}
 
 	async update(id: number, updateReviewDto: UpdatePostDto) {
