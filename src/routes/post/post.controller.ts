@@ -31,6 +31,11 @@ export class PostController {
 		return this.postService.findMany(ean);
 	}
 
+	@Get('general')
+	findGeneral() {
+		return this.postService.findGeneral();
+	}
+
 	@Get(':id')
 	findOne(@Param('id') id: string) {
 		return this.postService.findOne(+id);

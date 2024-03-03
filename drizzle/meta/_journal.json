@@ -8,6 +8,13 @@
       "when": 1709138144835,
       "tag": "0000_special_prodigy",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1709469586415,
+      "tag": "0001_yellow_boom_boom",
+      "breakpoints": true
     }
   ]
 }

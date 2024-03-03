@@ -59,11 +59,20 @@ export const productReviews = pgTable(
 
 export const posts = pgTable('Post', {
 	id: serial('id').primaryKey(),
-	body: text('body'),
+	title: varchar('title', { length: 100 }),
 	date: timestamp('date').defaultNow(),
 	productEAN: varchar('productEAN', { length: 15 }),
 	authorID: integer('authorID').references(() => users.id, {
 		onDelete: 'cascade'
+	})
+});
+
+export const postContents = pgTable('PostContent', {
+	id: serial('id').primaryKey(),
+	content: text('content'),
+	postID: integer('postID').references(() => posts.id, {
+		onDelete: 'cascade',
+		onUpdate: 'cascade'
 	})
 });
 
@@ -84,9 +93,13 @@ export const postReviews = pgTable(
 	})
 );
 
-export const postsRelations = relations(posts, ({ many }) => ({
+export const postsRelations = relations(posts, ({ one, many }) => ({
 	comments: many(comments),
-	reviews: many(postReviews)
+	reviews: many(postReviews),
+	content: one(postContents, {
+		fields: [posts.id],
+		references: [postContents.postID]
+	})
 }));
 
 export const comments = pgTable('Comment', {
@@ -98,6 +111,13 @@ export const comments = pgTable('Comment', {
 		onDelete: 'cascade'
 	})
 });
+
+export const commentsRelations = relations(comments, ({ one }) => ({
+	post: one(posts, {
+		fields: [comments.postID],
+		references: [posts.id]
+	})
+}));
 
 export const submissions = pgTable('Submission', {
 	id: serial('id').primaryKey(),

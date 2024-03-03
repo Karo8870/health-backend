@@ -3,10 +3,10 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../drizzle/schema';
-import { postReviews, posts } from '../../drizzle/schema';
+import { postContents, postReviews, posts } from '../../drizzle/schema';
 import { ClsService } from 'nestjs-cls';
 import { AuthClsStore } from '../auth/auth.guard';
-import { and, count, eq } from 'drizzle-orm';
+import { and, count, eq, isNull } from 'drizzle-orm';
 import { ReviewPostDto } from './dto/review-post.dto';
 
 @Injectable()
@@ -17,10 +17,20 @@ export class PostService {
 	) {}
 
 	async create(createPostDto: CreatePostDto) {
-		await this.db.insert(posts).values({
-			authorID: this.cls.get('userID'),
-			body: createPostDto.body,
-			productEAN: createPostDto.ean
+		const [{ id }] = await this.db
+			.insert(posts)
+			.values({
+				authorID: this.cls.get('userID'),
+				productEAN: createPostDto.ean,
+				title: createPostDto.title
+			})
+			.returning({
+				id: posts.id
+			});
+
+		await this.db.insert(postContents).values({
+			postID: id,
+			content: createPostDto.content
 		});
 	}
 
@@ -42,7 +52,13 @@ export class PostService {
 
 	async findOne(id: number) {
 		return {
-			body: (await this.db.select().from(posts).where(eq(posts.id, id)))[0],
+			body: await this.db.query.posts.findFirst({
+				where: eq(posts.id, id),
+				with: {
+					content: true,
+					comments: true
+				}
+			}),
 			...(
 				await this.db
 					.select({
@@ -63,23 +79,45 @@ export class PostService {
 	}
 
 	async findMany(ean: string) {
-		return (
-			await this.db
-				.select({
-					id: posts.id
-				})
-				.from(posts)
-				.where(eq(posts.productEAN, ean))
-		).map((el) => el.id);
+		return this.db
+			.select({
+				id: posts.id,
+				title: posts.title
+			})
+			.from(posts)
+			.where(eq(posts.productEAN, ean));
+	}
+
+	async findGeneral() {
+		return this.db
+			.select({
+				id: posts.id,
+				title: posts.title
+			})
+			.from(posts)
+			.where(isNull(posts.productEAN));
 	}
 
 	async update(id: number, updateReviewDto: UpdatePostDto) {
-		await this.db
-			.update(posts)
-			.set({
-				body: updateReviewDto.body
-			})
-			.where(and(eq(posts.id, id), eq(posts.authorID, this.cls.get('userID'))));
+		if (updateReviewDto.title) {
+			await this.db
+				.update(posts)
+				.set({
+					title: updateReviewDto.title
+				})
+				.where(
+					and(eq(posts.id, id), eq(posts.authorID, this.cls.get('userID')))
+				);
+		}
+
+		if (updateReviewDto.content) {
+			await this.db
+				.update(postContents)
+				.set({
+					content: updateReviewDto.content
+				})
+				.where(eq(postContents.postID, id));
+		}
 	}
 
 	async remove(id: number) {

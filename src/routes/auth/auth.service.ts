@@ -83,15 +83,23 @@ export class AuthService {
 	async updateCredentials(
 		updateCredentialsDto: UpdateCredentialsDto
 	): Promise<any> {
-		await this.db
-			.update(users)
-			.set({
-				firstName: updateCredentialsDto.firstName,
-				lastName: updateCredentialsDto.lastName,
-				user: updateCredentialsDto.user,
-				email: updateCredentialsDto.email
-			})
-			.where(eq(users.id, this.cls.get('userID')));
+		try {
+			await this.db
+				.update(users)
+				.set({
+					firstName: updateCredentialsDto.firstName,
+					lastName: updateCredentialsDto.lastName,
+					user: updateCredentialsDto.user,
+					email: updateCredentialsDto.email
+				})
+				.where(eq(users.id, this.cls.get('userID')));
+		} catch (e) {
+			if (e.code === '23505') {
+				throw new ConflictException(e.detail);
+			}
+
+			throw new InternalServerErrorException();
+		}
 	}
 
 	async updatePassword(updatePasswordDto: UpdatePasswordDto) {
