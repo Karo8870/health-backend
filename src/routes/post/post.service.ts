@@ -17,8 +17,6 @@ export class PostService {
 	) {}
 
 	async create(createPostDto: CreatePostDto) {
-		console.log(this.cls.get('userID'));
-
 		try {
 			const [{ id }] = await this.db
 				.insert(posts)
@@ -62,7 +60,10 @@ export class PostService {
 				.select()
 				.from(postReviews)
 				.where(
-					and(eq(posts.id, id), eq(posts.authorID, this.cls.get('userID')))
+					and(
+						eq(postReviews.postID, id),
+						eq(postReviews.userID, this.cls.get('userID'))
+					)
 				),
 			body: await this.db.query.posts.findFirst({
 				where: eq(posts.id, id),
@@ -160,7 +161,7 @@ export class PostService {
 
 	async findOwn() {
 		return {
-			posts: this.db.query.posts.findMany({
+			posts: await this.db.query.posts.findMany({
 				where: eq(posts.authorID, this.cls.get('userID')),
 				with: {
 					content: true,
