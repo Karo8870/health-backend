@@ -65,6 +65,7 @@ export class PostService {
 						eq(postReviews.userID, this.cls.get('userID'))
 					)
 				),
+			user: this.cls.get('userID'),
 			body: await this.db.query.posts.findFirst({
 				where: eq(posts.id, id),
 				with: {
