@@ -38,6 +38,15 @@ export class ProductService {
 					.from(productDetails)
 					.where(eq(productDetails.ean, ean))
 			)[0],
+			like: await this.db
+				.select()
+				.from(productReviews)
+				.where(
+					and(
+						eq(productReviews.productEAN, ean),
+						eq(productReviews.userID, this.cls.get('userID'))
+					)
+				),
 			...(
 				await this.db
 					.select({
