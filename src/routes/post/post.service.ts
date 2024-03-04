@@ -58,6 +58,12 @@ export class PostService {
 
 	async findOne(id: number) {
 		return {
+			like: await this.db
+				.select()
+				.from(postReviews)
+				.where(
+					and(eq(posts.id, id), eq(posts.authorID, this.cls.get('userID')))
+				),
 			body: await this.db.query.posts.findFirst({
 				where: eq(posts.id, id),
 				with: {
@@ -99,75 +105,84 @@ export class PostService {
 	}
 
 	async findMany(ean: string) {
-		return this.db.query.posts.findMany({
-			where: eq(posts.productEAN, ean),
-			with: {
-				content: true,
-				reviews: true,
-				comments: {
-					with: {
-						author: true
-					}
-				},
-				author: {
-					columns: {
-						id: true,
-						email: true,
-						firstName: true,
-						lastName: true,
-						user: true
+		return {
+			posts: await this.db.query.posts.findMany({
+				where: eq(posts.productEAN, ean),
+				with: {
+					content: true,
+					reviews: true,
+					comments: {
+						with: {
+							author: true
+						}
+					},
+					author: {
+						columns: {
+							id: true,
+							email: true,
+							firstName: true,
+							lastName: true,
+							user: true
+						}
 					}
 				}
-			}
-		});
+			}),
+			user: this.cls.get('userID')
+		};
 	}
 
 	async findGeneral() {
-		return this.db.query.posts.findMany({
-			where: isNull(posts.productEAN),
-			with: {
-				content: true,
-				reviews: true,
-				comments: {
-					with: {
-						author: true
-					}
-				},
-				author: {
-					columns: {
-						id: true,
-						email: true,
-						firstName: true,
-						lastName: true,
-						user: true
+		return {
+			posts: await this.db.query.posts.findMany({
+				where: isNull(posts.productEAN),
+				with: {
+					content: true,
+					reviews: true,
+					comments: {
+						with: {
+							author: true
+						}
+					},
+					author: {
+						columns: {
+							id: true,
+							email: true,
+							firstName: true,
+							lastName: true,
+							user: true
+						}
 					}
 				}
-			}
-		});
+			}),
+			user: this.cls.get('userID')
+		};
 	}
 
 	async findOwn() {
-		return this.db.query.posts.findMany({
-			where: eq(posts.authorID, this.cls.get('userID')),
-			with: {
-				content: true,
-				reviews: true,
-				comments: {
-					with: {
-						author: true
-					}
-				},
-				author: {
-					columns: {
-						id: true,
-						email: true,
-						firstName: true,
-						lastName: true,
-						user: true
+		return {
+			posts: this.db.query.posts.findMany({
+				where: eq(posts.authorID, this.cls.get('userID')),
+				with: {
+					content: true,
+					reviews: true,
+					comments: {
+						with: {
+							author: true
+						}
+					},
+					author: {
+						columns: {
+							id: true,
+							email: true,
+							firstName: true,
+							lastName: true,
+							user: true
+						}
 					}
 				}
-			}
-		});
+			}),
+			user: this.cls.get('userID')
+		};
 	}
 
 	async update(id: number, updateReviewDto: UpdatePostDto) {
