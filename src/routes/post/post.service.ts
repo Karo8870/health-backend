@@ -215,6 +215,13 @@ export class PostService {
 	}
 
 	async deleteReview(id: number) {
-		await this.db.delete(postReviews).where(eq(postReviews.postID, id));
+		await this.db
+			.delete(postReviews)
+			.where(
+				and(
+					eq(postReviews.postID, id),
+					eq(postReviews.userID, this.cls.get('userID'))
+				)
+			);
 	}
 }
