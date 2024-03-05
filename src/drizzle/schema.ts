@@ -22,7 +22,10 @@ export const users = pgTable('User', {
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({
-	preferences: one(preferences),
+	preferences: one(preferences, {
+		fields: [users.id],
+		references: [preferences.userID]
+	}),
 	reviews: many(posts),
 	submissions: many(submissions),
 	comments: many(comments),
@@ -59,6 +62,14 @@ export const productReviews = pgTable(
 		unq: unique().on(table.userID, table.productEAN)
 	})
 );
+
+export const productRelations = relations(productReviews, ({ one }) => ({
+	author: one(users, {
+		fields: [productReviews.userID],
+		references: [users.id]
+	})
+}));
+
 
 export const posts = pgTable('Post', {
 	id: serial('id').primaryKey(),
@@ -100,6 +111,10 @@ export const postReviewRelations = relations(postReviews, ({ one }) => ({
 	post: one(posts, {
 		fields: [postReviews.postID],
 		references: [posts.id]
+	}),
+	author: one(users, {
+		fields: [postReviews.userID],
+		references: [users.id]
 	})
 }));
 
@@ -148,3 +163,10 @@ export const submissions = pgTable('Submission', {
 		onDelete: 'cascade'
 	})
 });
+
+export const submissionRelations = relations(submissions, ({ one }) => ({
+	author: one(users, {
+		fields: [submissions.authorID],
+		references: [users.id]
+	})
+}));
