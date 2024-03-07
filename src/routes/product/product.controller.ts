@@ -11,6 +11,11 @@ export class ProductController {
 		return this.productService.review(ean, reviewPostDto);
 	}
 
+	@Get('search/:term')
+	search(@Param('term') term: string) {
+		return this.productService.search(term);
+	}
+
 	@Get(':ean')
 	findOne(@Param('ean') ean: string) {
 		return this.productService.findOne(ean);

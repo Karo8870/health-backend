@@ -1,9 +1,8 @@
-import { IsArray, IsEAN, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsEAN, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ValidateSubmissionsDto {
 	@IsNotEmpty()
-	@IsString()
 	@ApiProperty()
 	body: string;
 

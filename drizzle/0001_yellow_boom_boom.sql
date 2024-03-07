@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 CREATE TABLE IF NOT EXISTS "PostContent" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"content" text,

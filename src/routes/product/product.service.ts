@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../drizzle/schema';
 import { productDetails, productReviews } from '../../drizzle/schema';
-import { and, count, eq } from 'drizzle-orm';
+import { and, count, eq, sql } from 'drizzle-orm';
 import { ClsService } from 'nestjs-cls';
 import { AuthClsStore } from '../auth/auth.guard';
 import { ReviewProductDto } from './dto/review-product.dto';
@@ -28,6 +28,19 @@ export class ProductService {
 					like: reviewProductDto.like
 				}
 			});
+	}
+
+	async search(term: string) {
+		return this.db
+			.select({
+				data: productDetails.data,
+				id: productDetails.id,
+				ean: productDetails.ean
+			})
+			.from(productDetails)
+			.where(
+				sql`similarity(${term}, "ProductDetails".data -> 'product' ->> 'product_name') > 0.5`
+			);
 	}
 
 	async findOne(ean: string) {
