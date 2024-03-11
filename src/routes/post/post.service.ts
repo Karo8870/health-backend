@@ -48,7 +48,7 @@ export class PostService {
 				downVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, false)} THEN 1 END`
 				),
-				comments: sql`COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('id', ${comments.id}, 'body', ${comments.body}, 'date', ${comments.date}, 'author', JSONB_BUILD_OBJECT('id', ${this.commentAuthor.id}, 'user', ${this.commentAuthor.user}, 'firstName', ${this.commentAuthor.firstName}, 'lastName', ${this.commentAuthor.lastName}, 'email', ${this.commentAuthor.email}))) FILTER (WHERE ${comments.id} IS NOT NULL), '[]'::jsonb)`,
+				comments: sql`COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('id', ${comments.id}, 'body', ${comments.body}, 'date', ${comments.date}, 'author', JSONB_BUILD_OBJECT('id', ${this.commentAuthor.id}, 'user', ${this.commentAuthor.user}, 'firstName', ${this.commentAuthor.firstName}, 'lastName', ${this.commentAuthor.lastName}, 'email', ${this.commentAuthor.email}), 'own', ${eq(this.commentAuthor.id, this.cls.get('userID'))})) FILTER (WHERE ${comments.id} IS NOT NULL), '[]'::jsonb)`,
 				author: {
 					id: users.id,
 					user: users.user,
@@ -56,7 +56,8 @@ export class PostService {
 					lastName: users.lastName,
 					email: users.email
 				},
-				vote: this.ownReview.like
+				vote: this.ownReview.like,
+				own: eq(posts.authorID, this.cls.get('userID'))
 			})
 			.from(posts)
 			.leftJoin(postContents, eq(postContents.postID, id))
