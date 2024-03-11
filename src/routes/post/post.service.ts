@@ -29,6 +29,7 @@ export class PostService {
 	generateSelect(id: number | PgColumn) {
 		return this.db
 			.select({
+				id: posts.id,
 				title: posts.title,
 				body: postContents.content,
 				date: posts.date,
@@ -72,7 +73,7 @@ export class PostService {
 				.insert(posts)
 				.values({
 					authorID: this.cls.get('userID'),
-					productEAN: createPostDto.ean.replace(/^0/, ''),
+					productEAN: createPostDto.ean?.replace(/^0/, ''),
 					title: createPostDto.title
 				})
 				.returning({
@@ -84,7 +85,7 @@ export class PostService {
 				content: createPostDto.content
 			});
 		} catch (e) {
-			console.log(e.detail);
+			console.log(e);
 		}
 	}
 
