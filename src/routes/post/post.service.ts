@@ -100,7 +100,7 @@ export class PostService {
 				.leftJoin(comments, eq(comments.postID, id))
 				.leftJoin(commentAuthor, eq(commentAuthor.id, comments.authorID))
 				.where(eq(posts.id, id))
-				.groupBy(postContents.content, users.id, ownReview.like)
+				.groupBy(postContents.content, posts.title, users.id, ownReview.like)
 				.limit(1)
 		)[0];
 	}
@@ -143,7 +143,7 @@ export class PostService {
 			.leftJoin(comments, eq(comments.postID, posts.id))
 			.leftJoin(commentAuthor, eq(commentAuthor.id, comments.authorID))
 			.where(eq(posts.productEAN, ean.replace(/^0/, '')))
-			.groupBy(postContents.content, users.id, ownReview.like);
+			.groupBy(postContents.content, posts.title, users.id, ownReview.like);
 	}
 
 	async findGeneral() {
@@ -184,7 +184,7 @@ export class PostService {
 			.leftJoin(comments, eq(comments.postID, posts.id))
 			.leftJoin(commentAuthor, eq(commentAuthor.id, comments.authorID))
 			.where(isNull(posts.productEAN))
-			.groupBy(postContents.content, users.id, ownReview.like);
+			.groupBy(postContents.content, posts.title, users.id, ownReview.like);
 	}
 
 	async findOwn() {
@@ -194,6 +194,7 @@ export class PostService {
 		return this.db
 			.select({
 				body: postContents.content,
+				title: posts.title,
 				upVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN 1 END`
 				),
@@ -224,7 +225,7 @@ export class PostService {
 			.leftJoin(comments, eq(comments.postID, posts.id))
 			.leftJoin(commentAuthor, eq(commentAuthor.id, comments.authorID))
 			.where(eq(posts.authorID, this.cls.get('userID')))
-			.groupBy(postContents.content, users.id, ownReview.like);
+			.groupBy(postContents.content, posts.title, users.id, ownReview.like);
 	}
 
 	async update(id: number, updateReviewDto: UpdatePostDto) {
