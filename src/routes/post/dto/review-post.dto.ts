@@ -5,5 +5,5 @@ export class ReviewPostDto {
 	@IsNotEmpty()
 	@IsBoolean()
 	@ApiProperty()
-	like: boolean;
+	vote: boolean;
 }

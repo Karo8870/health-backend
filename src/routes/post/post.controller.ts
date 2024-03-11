@@ -21,7 +21,7 @@ export class PostController {
 		return this.postService.create(createReviewDto);
 	}
 
-	@Post('review/:id')
+	@Post('vote/:id')
 	review(@Param('id') id: string, @Body() reviewPostDto: ReviewPostDto) {
 		return this.postService.review(+id, reviewPostDto);
 	}
@@ -51,7 +51,7 @@ export class PostController {
 		return this.postService.update(+id, updateReviewDto);
 	}
 
-	@Delete('review/:id')
+	@Delete('vote/:id')
 	deleteReview(@Param('id') id: string) {
 		return this.postService.deleteReview(+id);
 	}

@@ -21,12 +21,12 @@ export class ProductService {
 			.values({
 				productEAN: ean.replace(/^0/, ''),
 				userID: this.cls.get('userID'),
-				like: reviewProductDto.like
+				like: reviewProductDto.vote
 			})
 			.onConflictDoUpdate({
 				target: [productReviews.userID, productReviews.productEAN],
 				set: {
-					like: reviewProductDto.like
+					like: reviewProductDto.vote
 				}
 			});
 	}
@@ -58,7 +58,7 @@ export class ProductService {
 					downVotes: count(
 						sql`CASE WHEN ${eq(productReviews.like, false)} THEN 1 END`
 					),
-					review: ownReview.like
+					vote: ownReview.like
 				})
 				.from(productDetails)
 				.leftJoin(

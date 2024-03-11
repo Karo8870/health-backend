@@ -1,14 +1,14 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { ReviewPostDto } from '../post/dto/review-post.dto';
+import { ReviewProductDto } from './dto/review-product.dto';
 
 @Controller('product')
 export class ProductController {
 	constructor(private readonly productService: ProductService) {}
 
-	@Post('review/:ean')
-	review(@Param('ean') ean: string, @Body() reviewPostDto: ReviewPostDto) {
-		return this.productService.review(ean, reviewPostDto);
+	@Post('vote/:ean')
+	review(@Param('ean') ean: string, @Body() reviewProductDto: ReviewProductDto) {
+		return this.productService.review(ean, reviewProductDto);
 	}
 
 	@Get('search/:term')
@@ -21,7 +21,7 @@ export class ProductController {
 		return this.productService.findOne(ean);
 	}
 
-	@Delete('review/:ean')
+	@Delete('vote/:ean')
 	deleteReview(@Param('ean') ean: string) {
 		return this.productService.deleteReview(ean);
 	}

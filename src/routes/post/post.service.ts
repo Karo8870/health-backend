@@ -51,12 +51,12 @@ export class PostService {
 			.values({
 				postID: id,
 				userID: this.cls.get('userID'),
-				like: reviewPostDto.like
+				like: reviewPostDto.vote
 			})
 			.onConflictDoUpdate({
 				target: [postReviews.userID, postReviews.postID],
 				set: {
-					like: reviewPostDto.like
+					like: reviewPostDto.vote
 				}
 			});
 	}
@@ -84,7 +84,7 @@ export class PostService {
 						lastName: users.lastName,
 						email: users.email
 					},
-					review: ownReview.like
+					vote: ownReview.like
 				})
 				.from(posts)
 				.leftJoin(postContents, eq(postContents.postID, id))
@@ -127,7 +127,7 @@ export class PostService {
 					lastName: users.lastName,
 					email: users.email
 				},
-				review: ownReview.like
+				vote: ownReview.like
 			})
 			.from(posts)
 			.leftJoin(postContents, eq(postContents.postID, posts.id))
@@ -168,7 +168,7 @@ export class PostService {
 					lastName: users.lastName,
 					email: users.email
 				},
-				review: ownReview.like
+				vote: ownReview.like
 			})
 			.from(posts)
 			.leftJoin(postContents, eq(postContents.postID, posts.id))
@@ -208,7 +208,7 @@ export class PostService {
 					lastName: users.lastName,
 					email: users.email
 				},
-				review: ownReview.like
+				vote: ownReview.like
 			})
 			.from(posts)
 			.leftJoin(postContents, eq(postContents.postID, posts.id))
@@ -266,5 +266,3 @@ export class PostService {
 			);
 	}
 }
-
-sql`SELECT pc.content AS body, COUNT(CASE WHEN pr.like = true THEN 1 END) AS likes, COUNT(CASE WHEN pr.like = false THEN 1 END) AS dislikes, JSON_BUILD_OBJECT('id', a.id, 'user', a.user, 'firstName', a."firstName", 'lastName', a."lastName", 'email', a.email) AS author, own.like AS review, JSON_AGG(JSON_BUILD_OBJECT('id', c.id, 'body', c.body, 'date', c.date, 'author', ca.*)) AS comments FROM "Post" p LEFT JOIN "PostContent" pc ON pc."postID" = p.id LEFT JOIN "PostReview" own ON own."postID" = p.id AND own."userID" = 4 LEFT JOIN "User" a ON p."authorID" = a.id LEFT JOIN "PostReview" pr ON p.id = pr."postID" LEFT JOIN "Comment" c ON c."postID" = p.id LEFT JOIN "User" ca ON c."authorID" = ca.id WHERE p.id = 6 GROUP BY pc.content, a.id, own.like;`;
