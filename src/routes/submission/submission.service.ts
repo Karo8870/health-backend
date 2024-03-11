@@ -20,7 +20,7 @@ export class SubmissionService {
 	async create(createSubmissionDto: CreateSubmissionDto) {
 		await this.db.insert(submissions).values({
 			authorID: this.cls.get('userID'),
-			productEAN: createSubmissionDto.ean,
+			productEAN: createSubmissionDto.ean.replace(/^0/, ''),
 			status: 'pending',
 			body: createSubmissionDto.body
 		});
@@ -83,11 +83,11 @@ export class SubmissionService {
 			.insert(productDetails)
 			.values({
 				data: validateSubmissionsDto.body,
-				ean: validateSubmissionsDto.ean
+				ean: validateSubmissionsDto.ean.replace(/^0/, '')
 			})
 			.onConflictDoUpdate({
 				set: {
-					data: validateSubmissionsDto.ean
+					data: validateSubmissionsDto.ean.replace(/^0/, '')
 				},
 				target: [productDetails.id]
 			});

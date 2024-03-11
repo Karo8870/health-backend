@@ -5,7 +5,7 @@ config();
 
 export const jwtConstants = {
 	key: process.env.JWT_KEY,
-	expiresIn: '24h'
+	expiresIn: '365d'
 };
 
 export const db_url = process.env.DATABASE_URL;

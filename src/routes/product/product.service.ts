@@ -6,6 +6,7 @@ import { and, count, eq, sql } from 'drizzle-orm';
 import { ClsService } from 'nestjs-cls';
 import { AuthClsStore } from '../auth/auth.guard';
 import { ReviewProductDto } from './dto/review-product.dto';
+import { alias } from 'drizzle-orm/pg-core';
 
 @Injectable()
 export class ProductService {
@@ -18,7 +19,7 @@ export class ProductService {
 		await this.db
 			.insert(productReviews)
 			.values({
-				productEAN: ean,
+				productEAN: ean.replace(/^0/, ''),
 				userID: this.cls.get('userID'),
 				like: reviewProductDto.like
 			})
@@ -39,59 +40,52 @@ export class ProductService {
 			})
 			.from(productDetails)
 			.where(
-				sql`similarity(${term}, "ProductDetails".data -> 'product' ->> 'product_name') > 0.5`
-			);
+				sql`similarity(${term}, "ProductDetails".data -> 'product' ->> 'product_name') > 0.4`
+			)
+			.limit(10);
 	}
 
 	async findOne(ean: string) {
-		return {
-			body: (
-				await this.db
-					.select()
-					.from(productDetails)
-					.where(eq(productDetails.ean, ean))
-			)[0],
-			like: await this.db
-				.select()
-				.from(productReviews)
-				.where(
+		const ownReview = alias(productReviews, 'ownReview');
+
+		return (
+			await this.db
+				.select({
+					body: productDetails.data,
+					likes: count(
+						sql`CASE WHEN ${eq(productReviews.like, true)} THEN 1 END`
+					),
+					dislikes: count(
+						sql`CASE WHEN ${eq(productReviews.like, false)} THEN 1 END`
+					),
+					review: ownReview.like
+				})
+				.from(productDetails)
+				.leftJoin(
+					productReviews,
+					eq(productReviews.productEAN, ean.replace(/^0/, ''))
+				)
+				.leftJoin(
+					ownReview,
 					and(
-						eq(productReviews.productEAN, ean),
-						eq(productReviews.userID, this.cls.get('userID'))
+						eq(ownReview.productEAN, ean.replace(/^0/, '')),
+						eq(ownReview.userID, this.cls.get('userID'))
 					)
-				),
-			...(
-				await this.db
-					.select({
-						likes: count()
-					})
-					.from(productReviews)
-					.where(
-						and(
-							eq(productReviews.productEAN, ean),
-							eq(productReviews.like, true)
-						)
-					)
-			)[0],
-			...(
-				await this.db
-					.select({
-						dislikes: count()
-					})
-					.from(productReviews)
-					.where(
-						and(
-							eq(productReviews.productEAN, ean),
-							eq(productReviews.like, false)
-						)
-					)
-			)[0]
-		};
+				)
+				.where(eq(productDetails.ean, ean.replace(/^0/, '')))
+				.groupBy(productDetails.data, ownReview.like)
+				.limit(1)
+		)[0];
 	}
 
 	async deleteReview(ean: string) {
 		await this.db
 			.delete(productReviews)
-			.where(eq(productReviews.productEAN, ean));
+			.where(
+				and(
+					eq(productReviews.productEAN, ean.replace(/^0/, '')),
+					eq(productReviews.userID, this.cls.get('userID'))
+				)
+			);
 	}
 }
