@@ -52,10 +52,10 @@ export class ProductService {
 			await this.db
 				.select({
 					body: productDetails.data,
-					likes: count(
+					upVotes: count(
 						sql`CASE WHEN ${eq(productReviews.like, true)} THEN 1 END`
 					),
-					dislikes: count(
+					downVotes: count(
 						sql`CASE WHEN ${eq(productReviews.like, false)} THEN 1 END`
 					),
 					review: ownReview.like

@@ -68,11 +68,12 @@ export class PostService {
 		return (
 			await this.db
 				.select({
+					title: posts.title,
 					body: postContents.content,
-					likes: count(
+					upVotes: count(
 						sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN 1 END`
 					),
-					dislikes: count(
+					downVotes: count(
 						sql`DISTINCT CASE WHEN ${eq(postReviews.like, false)} THEN 1 END`
 					),
 					comments: sql`COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('id', ${comments.id}, 'body', ${comments.body}, 'date', ${comments.date}, 'author', JSONB_BUILD_OBJECT('id', ${commentAuthor.id}, 'user', ${commentAuthor.user}, 'firstName', ${commentAuthor.firstName}, 'lastName', ${commentAuthor.lastName}, 'email', ${commentAuthor.email}))) FILTER (WHERE ${comments.id} IS NOT NULL), '[]'::jsonb)`,
@@ -110,11 +111,12 @@ export class PostService {
 
 		return this.db
 			.select({
+				title: posts.title,
 				body: postContents.content,
-				likes: count(
+				upVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN 1 END`
 				),
-				dislikes: count(
+				downVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, false)} THEN 1 END`
 				),
 				comments: sql`COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('id', ${comments.id}, 'body', ${comments.body}, 'date', ${comments.date}, 'author', JSONB_BUILD_OBJECT('id', ${commentAuthor.id}, 'user', ${commentAuthor.user}, 'firstName', ${commentAuthor.firstName}, 'lastName', ${commentAuthor.lastName}, 'email', ${commentAuthor.email}))) FILTER (WHERE ${comments.id} IS NOT NULL), '[]'::jsonb)`,
@@ -150,11 +152,12 @@ export class PostService {
 
 		return this.db
 			.select({
+				title: posts.title,
 				body: postContents.content,
-				likes: count(
+				upVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN 1 END`
 				),
-				dislikes: count(
+				downVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, false)} THEN 1 END`
 				),
 				comments: sql`COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('id', ${comments.id}, 'body', ${comments.body}, 'date', ${comments.date}, 'author', JSONB_BUILD_OBJECT('id', ${commentAuthor.id}, 'user', ${commentAuthor.user}, 'firstName', ${commentAuthor.firstName}, 'lastName', ${commentAuthor.lastName}, 'email', ${commentAuthor.email}))) FILTER (WHERE ${comments.id} IS NOT NULL), '[]'::jsonb)`,
@@ -191,10 +194,10 @@ export class PostService {
 		return this.db
 			.select({
 				body: postContents.content,
-				likes: count(
+				upVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN 1 END`
 				),
-				dislikes: count(
+				downVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, false)} THEN 1 END`
 				),
 				comments: sql`COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('id', ${comments.id}, 'body', ${comments.body}, 'date', ${comments.date}, 'author', JSONB_BUILD_OBJECT('id', ${commentAuthor.id}, 'user', ${commentAuthor.user}, 'firstName', ${commentAuthor.firstName}, 'lastName', ${commentAuthor.lastName}, 'email', ${commentAuthor.email}))) FILTER (WHERE ${comments.id} IS NOT NULL), '[]'::jsonb)`,
