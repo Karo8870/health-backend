@@ -70,6 +70,7 @@ export class PostService {
 				.select({
 					title: posts.title,
 					body: postContents.content,
+					date: posts.date,
 					upVotes: count(
 						sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN 1 END`
 					),
@@ -113,6 +114,7 @@ export class PostService {
 			.select({
 				title: posts.title,
 				body: postContents.content,
+				date: posts.date,
 				upVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN 1 END`
 				),
@@ -154,6 +156,7 @@ export class PostService {
 			.select({
 				title: posts.title,
 				body: postContents.content,
+				date: posts.date,
 				upVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN 1 END`
 				),
@@ -195,6 +198,7 @@ export class PostService {
 			.select({
 				body: postContents.content,
 				title: posts.title,
+				date: posts.date,
 				upVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN 1 END`
 				),
