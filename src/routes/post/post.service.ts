@@ -21,6 +21,15 @@ export class PostService {
 	private ownReview = alias(postReviews, 'ownReview');
 	private commentAuthor = alias(users, 'commentAuthor');
 
+	private selectPostGroupBy = [
+		postContents.content,
+		posts.id,
+		posts.title,
+		posts.date,
+		users.id,
+		this.ownReview.like
+	];
+
 	constructor(
 		@Inject('DB') private db: NodePgDatabase<typeof schema>,
 		private cls: ClsService<AuthClsStore>
@@ -109,13 +118,7 @@ export class PostService {
 		return (
 			await this.generateSelect(id)
 				.where(eq(posts.id, id))
-				.groupBy(
-					postContents.content,
-					posts.title,
-					posts.date,
-					users.id,
-					this.ownReview.like
-				)
+				.groupBy(...this.selectPostGroupBy)
 				.limit(1)
 		)[0];
 	}
@@ -123,37 +126,19 @@ export class PostService {
 	async findMany(ean: string) {
 		return this.generateSelect(posts.id)
 			.where(eq(posts.productEAN, ean.replace(/^0/, '')))
-			.groupBy(
-				postContents.content,
-				posts.title,
-				posts.date,
-				users.id,
-				this.ownReview.like
-			);
+			.groupBy(...this.selectPostGroupBy);
 	}
 
 	async findGeneral() {
 		return this.generateSelect(posts.id)
 			.where(isNull(posts.productEAN))
-			.groupBy(
-				postContents.content,
-				posts.title,
-				posts.date,
-				users.id,
-				this.ownReview.like
-			);
+			.groupBy(...this.selectPostGroupBy);
 	}
 
 	async findOwn() {
 		return this.generateSelect(posts.id)
 			.where(eq(posts.authorID, this.cls.get('userID')))
-			.groupBy(
-				postContents.content,
-				posts.title,
-				posts.date,
-				users.id,
-				this.ownReview.like
-			);
+			.groupBy(...this.selectPostGroupBy);
 	}
 
 	async update(id: number, updateReviewDto: UpdatePostDto) {
