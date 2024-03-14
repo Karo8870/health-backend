@@ -44,10 +44,10 @@ export class PostService {
 				date: posts.date,
 				productEAN: posts.productEAN,
 				upVotes: count(
-					sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN 1 END`
+					sql`DISTINCT CASE WHEN ${eq(postReviews.like, true)} THEN CONCAT(${postReviews.postID}, '-', ${postReviews.userID}) END`
 				),
 				downVotes: count(
-					sql`DISTINCT CASE WHEN ${eq(postReviews.like, false)} THEN 1 END`
+					sql`DISTINCT CASE WHEN ${eq(postReviews.like, false)} THEN CONCAT(${postReviews.postID}, '-', ${postReviews.userID}) END`
 				),
 				comments: sql`COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('id', ${comments.id}, 'body', ${comments.body}, 'date', ${comments.date}, 'author', JSONB_BUILD_OBJECT('id', ${this.commentAuthor.id}, 'user', ${this.commentAuthor.user}, 'firstName', ${this.commentAuthor.firstName}, 'lastName', ${this.commentAuthor.lastName}, 'email', ${this.commentAuthor.email}), 'own', ${eq(this.commentAuthor.id, this.cls.get('userID'))})) FILTER (WHERE ${comments.id} IS NOT NULL), '[]'::jsonb)`,
 				author: {
@@ -117,6 +117,11 @@ export class PostService {
 	}
 
 	async findOne(id: number) {
+		console.log(this.generateSelect(id)
+			.where(eq(posts.id, id))
+			.groupBy(...this.selectPostGroupBy)
+			.limit(1).toSQL())
+
 		return (
 			await this.generateSelect(id)
 				.where(eq(posts.id, id))
