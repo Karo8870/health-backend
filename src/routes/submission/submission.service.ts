@@ -53,7 +53,7 @@ export class SubmissionService {
 	async findAllByProduct(ean: string) {
 		return this.db.query.submissions.findMany({
 			where: and(
-				eq(submissions.productEAN, ean),
+				eq(submissions.productEAN, ean.replace(/^0/, '')),
 				eq(submissions.status, 'pending')
 			)
 		});

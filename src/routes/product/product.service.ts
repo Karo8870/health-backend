@@ -6,7 +6,6 @@ import { and, count, eq, sql } from 'drizzle-orm';
 import { ClsService } from 'nestjs-cls';
 import { AuthClsStore } from '../auth/auth.guard';
 import { ReviewProductDto } from './dto/review-product.dto';
-import { alias } from 'drizzle-orm/pg-core';
 
 @Injectable()
 export class ProductService {
@@ -46,36 +45,43 @@ export class ProductService {
 	}
 
 	async findOne(ean: string) {
-		const ownReview = alias(productReviews, 'ownReview');
-
-		return (
-			await this.db
-				.select({
-					body: productDetails.data,
-					upVotes: count(
-						sql`CASE WHEN ${eq(productReviews.like, true)} THEN 1 END`
-					),
-					downVotes: count(
-						sql`CASE WHEN ${eq(productReviews.like, false)} THEN 1 END`
-					),
-					vote: ownReview.like
-				})
-				.from(productDetails)
-				.leftJoin(
-					productReviews,
-					eq(productReviews.productEAN, ean.replace(/^0/, ''))
-				)
-				.leftJoin(
-					ownReview,
-					and(
-						eq(ownReview.productEAN, ean.replace(/^0/, '')),
-						eq(ownReview.userID, this.cls.get('userID'))
+		return {
+			...(
+				await this.db
+					.select({
+						upVotes: count(
+							sql`CASE WHEN ${eq(productReviews.like, true)} THEN 1 END`
+						),
+						downVotes: count(
+							sql`CASE WHEN ${eq(productReviews.like, false)} THEN 1 END`
+						)
+					})
+					.from(productReviews)
+					.where(eq(productReviews.productEAN, ean.replace(/^0/, '')))
+			)[0],
+			...(
+				await this.db
+					.select({
+						vote: productReviews.like
+					})
+					.from(productReviews)
+					.where(
+						and(
+							eq(productReviews.userID, this.cls.get('userID')),
+							eq(productReviews.productEAN, ean.replace(/^0/, ''))
+						)
 					)
-				)
-				.where(eq(productDetails.ean, ean.replace(/^0/, '')))
-				.groupBy(productDetails.data, ownReview.like)
-				.limit(1)
-		)[0];
+			)[0],
+			body: (
+				await this.db
+					.select({
+						body: productDetails.data
+					})
+					.from(productDetails)
+					.where(eq(productDetails.ean, ean.replace(/^0/, '')))
+					.limit(1)
+			)[0]
+		};
 	}
 
 	async deleteReview(ean: string) {
