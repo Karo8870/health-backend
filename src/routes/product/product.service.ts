@@ -72,7 +72,7 @@ export class ProductService {
 						)
 					)
 			)[0],
-			body: (
+			...(
 				await this.db
 					.select({
 						body: productDetails.data

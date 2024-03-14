@@ -11,6 +11,7 @@ import { PostModule } from './routes/post/post.module';
 import { SubmissionModule } from './routes/submission/submission.module';
 import { db_url } from './core/constants';
 import { CommentModule } from './routes/comment/comment.module';
+import { AiModule } from './routes/ai/ai.module';
 
 @Module({
 	imports: [
@@ -35,7 +36,8 @@ import { CommentModule } from './routes/comment/comment.module';
 		ProductModule,
 		PostModule,
 		SubmissionModule,
-		CommentModule
+		CommentModule,
+		AiModule
 	],
 	providers: [
 		{

@@ -28,12 +28,14 @@ export class ProfileService {
 	}
 
 	async getPreferences() {
-		return this.db
-			.select({
-				data: preferences.data
-			})
-			.from(preferences)
-			.where(eq(preferences.userID, this.cls.get('userID')));
+		return (
+			await this.db
+				.select({
+					data: preferences.data
+				})
+				.from(preferences)
+				.where(eq(preferences.userID, this.cls.get('userID')))
+		)[0].data;
 	}
 
 	async updatePreferences(updateProfileDto: UpdateProfileDto) {

@@ -117,11 +117,6 @@ export class PostService {
 	}
 
 	async findOne(id: number) {
-		console.log(this.generateSelect(id)
-			.where(eq(posts.id, id))
-			.groupBy(...this.selectPostGroupBy)
-			.limit(1).toSQL())
-
 		return (
 			await this.generateSelect(id)
 				.where(eq(posts.id, id))
