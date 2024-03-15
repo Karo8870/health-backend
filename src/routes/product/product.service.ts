@@ -2,7 +2,18 @@ import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../drizzle/schema';
 import { productDetails, productReviews } from '../../drizzle/schema';
-import { and, count, eq, gt, gte, lt, lte, sql } from 'drizzle-orm';
+import {
+	and,
+	between,
+	count,
+	eq,
+	gt,
+	gte,
+	lt,
+	lte,
+	or,
+	sql
+} from 'drizzle-orm';
 import { ClsService } from 'nestjs-cls';
 import { AuthClsStore } from '../auth/auth.guard';
 import { ReviewProductDto } from './dto/review-product.dto';
@@ -31,50 +42,61 @@ export class ProductService {
 	}
 
 	generateWhereClause(recommendProductDto: any) {
-		return and(
-			...Object.keys(recommendProductDto).map((key) => {
-				const path = key.split('.');
+		return Object.keys(recommendProductDto).map((key) => {
+			const path = key.split('.');
 
-				const sqlCond = sql(
-					[
-						'"ProductDetails".data -> ',
-						// @ts-ignore
-						Array(path.length - 1).fill(' ->> ')
-					],
-					...path
-				);
+			const sqlCond = sql(
+				[
+					'"ProductDetails".data -> ',
+					// @ts-ignore
+					Array(path.length - 1).fill(' ->> ')
+				],
+				...path
+			);
 
-				switch (recommendProductDto[key].action) {
-					case 'eq':
-						return eq(sqlCond, recommendProductDto[key].value);
+			switch (recommendProductDto[key].action) {
+				case 'eq':
+					return eq(sqlCond, recommendProductDto[key].value);
 
-					case 'gt':
-						return gt(sqlCond, recommendProductDto[key].value);
+				case 'gt':
+					return gt(sqlCond, recommendProductDto[key].value);
 
-					case 'gte':
-						return gte(sqlCond, recommendProductDto[key].value);
+				case 'gte':
+					return gte(sqlCond, recommendProductDto[key].value);
 
-					case 'lt':
-						return lt(sqlCond, recommendProductDto[key].value);
+				case 'lt':
+					return lt(sqlCond, recommendProductDto[key].value);
 
-					case 'lte':
-						return lte(sqlCond, recommendProductDto[key].value);
+				case 'lte':
+					return lte(sqlCond, recommendProductDto[key].value);
 
-					case 'contains':
-						return sql`(${sqlCond})::jsonb @> ${JSON.stringify(recommendProductDto[key].value)}::jsonb`;
+				case 'contains':
+					return sql`(${sqlCond})::jsonb @> ${JSON.stringify(recommendProductDto[key].value)}::jsonb`;
 
-					case 'not_contains':
-						return sql`NOT (${sqlCond})::jsonb @> ${JSON.stringify(recommendProductDto[key].value)}::jsonb`;
-				}
-			})
-		);
+				case 'not_contains':
+					return sql`NOT (${sqlCond})::jsonb @> ${JSON.stringify(recommendProductDto[key].value)}::jsonb`;
+
+				case 'bt':
+					return between(
+						sqlCond,
+						recommendProductDto[key].value.min,
+						recommendProductDto[key].value.max
+					);
+			}
+		});
 	}
 
-	async recommend(recommendProductDto: any) {
+	async recommend(recommendProductDto: { optional: any; mandatory: any }) {
 		return this.db
 			.select()
 			.from(productDetails)
-			.where(this.generateWhereClause(recommendProductDto)).limit(10);
+			.where(
+				and(
+					or(...this.generateWhereClause(recommendProductDto.optional)),
+					...this.generateWhereClause(recommendProductDto.mandatory)
+				)
+			)
+			.limit(10);
 	}
 
 	async search(term: string) {
