@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../drizzle/schema';
 import { productDetails, productReviews } from '../../drizzle/schema';
-import { and, count, eq, sql } from 'drizzle-orm';
+import { and, count, eq, gt, gte, lt, lte, sql } from 'drizzle-orm';
 import { ClsService } from 'nestjs-cls';
 import { AuthClsStore } from '../auth/auth.guard';
 import { ReviewProductDto } from './dto/review-product.dto';
@@ -30,6 +30,53 @@ export class ProductService {
 			});
 	}
 
+	generateWhereClause(recommendProductDto: any) {
+		return and(
+			...Object.keys(recommendProductDto).map((key) => {
+				const path = key.split('.');
+
+				const sqlCond = sql(
+					[
+						'"ProductDetails".data -> ',
+						// @ts-ignore
+						Array(path.length - 1).fill(' ->> ')
+					],
+					...path
+				);
+
+				switch (recommendProductDto[key].action) {
+					case 'eq':
+						return eq(sqlCond, recommendProductDto[key].value);
+
+					case 'gt':
+						return gt(sqlCond, recommendProductDto[key].value);
+
+					case 'gte':
+						return gte(sqlCond, recommendProductDto[key].value);
+
+					case 'lt':
+						return lt(sqlCond, recommendProductDto[key].value);
+
+					case 'lte':
+						return lte(sqlCond, recommendProductDto[key].value);
+
+					case 'contains':
+						return sql`(${sqlCond})::jsonb @> ${JSON.stringify(recommendProductDto[key].value)}::jsonb`;
+
+					case 'not_contains':
+						return sql`NOT (${sqlCond})::jsonb @> ${JSON.stringify(recommendProductDto[key].value)}::jsonb`;
+				}
+			})
+		);
+	}
+
+	async recommend(recommendProductDto: any) {
+		return this.db
+			.select()
+			.from(productDetails)
+			.where(this.generateWhereClause(recommendProductDto)).limit(10);
+	}
+
 	async search(term: string) {
 		return this.db
 			.select({
@@ -39,7 +86,7 @@ export class ProductService {
 			})
 			.from(productDetails)
 			.where(
-				sql`similarity(${term}, "ProductDetails".data -> 'product' ->> 'product_name') > 0.4`
+				sql`similarity(${term}, ${productDetails.data} -> 'product' ->> 'product_name') > 0.4`
 			)
 			.limit(10);
 	}

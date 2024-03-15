@@ -11,6 +11,11 @@ export class ProductController {
 		return this.productService.review(ean, reviewProductDto);
 	}
 
+	@Get('recommend')
+	recommend(@Body() recommendProductDto: any) {
+		return this.productService.recommend(recommendProductDto);
+	}
+
 	@Get('search/:term')
 	search(@Param('term') term: string) {
 		return this.productService.search(term);
