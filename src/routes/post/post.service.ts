@@ -49,7 +49,7 @@ export class PostService {
 				downVotes: count(
 					sql`DISTINCT CASE WHEN ${eq(postReviews.like, false)} THEN CONCAT(${postReviews.postID}, '-', ${postReviews.userID}) END`
 				),
-				comments: sql`COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('id', ${comments.id}, 'body', ${comments.body}, 'date', ${comments.date}, 'author', JSONB_BUILD_OBJECT('id', ${this.commentAuthor.id}, 'user', ${this.commentAuthor.user}, 'firstName', ${this.commentAuthor.firstName}, 'lastName', ${this.commentAuthor.lastName}, 'email', ${this.commentAuthor.email}), 'own', ${eq(this.commentAuthor.id, this.cls.get('userID'))})) FILTER (WHERE ${comments.id} IS NOT NULL), '[]'::jsonb)`,
+				comments: sql`COALESCE(JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT('id', ${comments.id}, 'body', ${comments.body}, 'date', ${comments.date}, 'author', JSONB_BUILD_OBJECT('id', ${this.commentAuthor.id}, 'user', ${this.commentAuthor.user}, 'firstName', ${this.commentAuthor.firstName}, 'lastName', ${this.commentAuthor.lastName}, 'email', ${this.commentAuthor.email}), 'own', ${eq(this.commentAuthor.id, this.cls.get('userID'))})) FILTER (WHERE ${comments.id} IS NOT NULL), '[]'::jsonb)`,
 				author: {
 					id: users.id,
 					user: users.user,
