@@ -46,11 +46,8 @@ export class ProductService {
 			const path = key.split('.');
 
 			const sqlCond = sql(
-				[
-					'"ProductDetails".data -> ',
-					// @ts-ignore
-					Array(path.length - 1).fill(' ->> ')
-				],
+				// @ts-ignore
+				['"ProductDetails".data -> ', ...Array(path.length - 1).fill(' ->> ')],
 				...path
 			);
 
@@ -87,6 +84,20 @@ export class ProductService {
 	}
 
 	async recommend(recommendProductDto: { optional: any; mandatory: any }) {
+		console.log(
+			this.db
+				.select()
+				.from(productDetails)
+				.where(
+					and(
+						or(...this.generateWhereClause(recommendProductDto.optional)),
+						...this.generateWhereClause(recommendProductDto.mandatory)
+					)
+				)
+				.limit(10)
+				.toSQL()
+		);
+
 		return this.db
 			.select()
 			.from(productDetails)
