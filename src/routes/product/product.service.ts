@@ -47,7 +47,11 @@ export class ProductService {
 
 			const sqlCond = sql(
 				// @ts-ignore
-				['"ProductDetails".data -> ', ...Array(path.length - 1).fill(' ->> ')],
+				[
+					'"ProductDetails".data -> ',
+					...Array(path.length - 2).fill(' -> '),
+					'->>'
+				],
 				...path
 			);
 
