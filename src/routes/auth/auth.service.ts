@@ -65,7 +65,9 @@ export class AuthService {
 				});
 
 			await this.db.insert(preferences).values({
-				userID: user.id
+				userID: user.id,
+				data: {},
+				personal: {}
 			});
 		} catch (e) {
 			if (e.code === '23505') {

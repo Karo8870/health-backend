@@ -36,7 +36,7 @@ export class ProfileService {
 				})
 				.from(preferences)
 				.where(eq(preferences.userID, this.cls.get('userID')))
-		)[0].data;
+		)[0];
 	}
 
 	async updatePreferences(updateProfileDto: UpdateProfileDto) {
