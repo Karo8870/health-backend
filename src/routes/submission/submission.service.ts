@@ -94,9 +94,9 @@ export class SubmissionService {
 			})
 			.onConflictDoUpdate({
 				set: {
-					data: validateSubmissionsDto.ean.replace(/^0/, '')
+					data: validateSubmissionsDto.body
 				},
-				target: [productDetails.id]
+				target: [productDetails.ean]
 			});
 	}
 

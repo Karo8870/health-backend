@@ -1,0 +1,1 @@
+ALTER TABLE "Restriction" ADD COLUMN "personal" jsonb;
