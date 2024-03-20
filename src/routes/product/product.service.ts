@@ -88,28 +88,28 @@ export class ProductService {
 	}
 
 	async recommend(recommendProductDto: { optional: any; mandatory: any }) {
-		console.log(
-			this.db
-				.select()
-				.from(productDetails)
-				.where(
-					and(
-						or(...this.generateWhereClause(recommendProductDto.optional)),
-						...this.generateWhereClause(recommendProductDto.mandatory)
-					)
-				)
-				.limit(10)
-				.toSQL()
-		);
-
 		return this.db
-			.select()
+			.select({
+				data: productDetails.data,
+				id: productDetails.id,
+				ean: productDetails.ean,
+				upVotes: count(
+					sql`CASE WHEN ${eq(productReviews.like, true)} THEN 1 END`
+				),
+				downVotes: count(
+					sql`CASE WHEN ${eq(productReviews.like, false)} THEN 1 END`
+				)
+			})
 			.from(productDetails)
 			.where(
 				and(
 					or(...this.generateWhereClause(recommendProductDto.optional)),
 					...this.generateWhereClause(recommendProductDto.mandatory)
 				)
+			)
+			.leftJoin(
+				productReviews,
+				eq(productReviews.productEAN, productDetails.ean)
 			)
 			.limit(10);
 	}
@@ -119,11 +119,21 @@ export class ProductService {
 			.select({
 				data: productDetails.data,
 				id: productDetails.id,
-				ean: productDetails.ean
+				ean: productDetails.ean,
+				upVotes: count(
+					sql`CASE WHEN ${eq(productReviews.like, true)} THEN 1 END`
+				),
+				downVotes: count(
+					sql`CASE WHEN ${eq(productReviews.like, false)} THEN 1 END`
+				)
 			})
 			.from(productDetails)
 			.where(
 				sql`similarity(${term}, ${productDetails.data} -> 'product' ->> 'product_name') > 0.4`
+			)
+			.leftJoin(
+				productReviews,
+				eq(productReviews.productEAN, productDetails.ean)
 			)
 			.limit(10);
 	}

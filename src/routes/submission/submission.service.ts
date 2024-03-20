@@ -35,7 +35,9 @@ export class SubmissionService {
 	async findAll() {
 		return (
 			await this.db
-				.selectDistinctOn([submissions.productEAN], { ean: submissions.productEAN })
+				.selectDistinctOn([submissions.productEAN], {
+					ean: submissions.productEAN
+				})
 				.from(submissions)
 				.where(eq(submissions.status, 'pending'))
 		).map((el) => el.ean);
@@ -51,12 +53,17 @@ export class SubmissionService {
 	}
 
 	async findAllByProduct(ean: string) {
-		return this.db.query.submissions.findMany({
-			where: and(
-				eq(submissions.productEAN, ean.replace(/^0/, '')),
-				eq(submissions.status, 'pending')
-			)
-		});
+		return {
+			submissions: await this.db.query.submissions.findMany({
+				where: and(
+					eq(submissions.productEAN, ean.replace(/^0/, '')),
+					eq(submissions.status, 'pending')
+				)
+			}),
+			product: await this.db.query.productDetails.findFirst({
+				where: eq(productDetails.ean, ean.replace(/^0/, ''))
+			})
+		};
 	}
 
 	async update(id: number, updateSubmissionDto: UpdateSubmissionDto) {
