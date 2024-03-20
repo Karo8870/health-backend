@@ -20,4 +20,9 @@ export class ProfileController {
 	updatePreferences(@Body() updateProfileDto: UpdateProfileDto) {
 		return this.profileService.updatePreferences(updateProfileDto);
 	}
+
+	@Patch('personal')
+	updatePersonal(@Body() updateProfileDto: UpdateProfileDto) {
+		return this.profileService.updatePersonal(updateProfileDto);
+	}
 }

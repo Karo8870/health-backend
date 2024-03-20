@@ -31,7 +31,8 @@ export class ProfileService {
 		return (
 			await this.db
 				.select({
-					data: preferences.data
+					data: preferences.data,
+					personal: preferences.personal
 				})
 				.from(preferences)
 				.where(eq(preferences.userID, this.cls.get('userID')))
@@ -43,6 +44,18 @@ export class ProfileService {
 			.update(preferences)
 			.set({
 				data: updateProfileDto.data
+			})
+			.where(eq(preferences.userID, this.cls.get('userID')))
+			.returning({
+				id: preferences.userID
+			});
+	}
+
+	async updatePersonal(updateProfileDto: UpdateProfileDto) {
+		await this.db
+			.update(preferences)
+			.set({
+				personal: updateProfileDto.data
 			})
 			.where(eq(preferences.userID, this.cls.get('userID')))
 			.returning({

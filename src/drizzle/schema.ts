@@ -39,7 +39,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 export const preferences = pgTable('Restriction', {
 	id: serial('id').primaryKey(),
 	userID: integer('userID').references(() => users.id, { onDelete: 'cascade' }),
-	data: jsonb('data')
+	data: jsonb('data'),
+	personal: jsonb('personal')
 });
 
 export const productDetails = pgTable('ProductDetails', {
@@ -69,7 +70,6 @@ export const productRelations = relations(productReviews, ({ one }) => ({
 		references: [users.id]
 	})
 }));
-
 
 export const posts = pgTable('Post', {
 	id: serial('id').primaryKey(),
