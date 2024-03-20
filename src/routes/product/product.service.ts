@@ -111,6 +111,7 @@ export class ProductService {
 				productReviews,
 				eq(productReviews.productEAN, productDetails.ean)
 			)
+			.groupBy(productDetails.data, productDetails.id, productDetails.ean)
 			.limit(10);
 	}
 
@@ -135,6 +136,7 @@ export class ProductService {
 				productReviews,
 				eq(productReviews.productEAN, productDetails.ean)
 			)
+			.groupBy(productDetails.data, productDetails.id, productDetails.ean)
 			.limit(10);
 	}
 
