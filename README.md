@@ -2,6 +2,9 @@ Video: https://drive.google.com/file/d/1T9soxuGdAG8MRSk-JPBrYlNL0jG6m-xX/view?us
 
 # FIICode backend
 
+## Install dependencies
+    npm install
+
 ### Update schema:
     npm run gen
 
@@ -10,3 +13,6 @@ Video: https://drive.google.com/file/d/1T9soxuGdAG8MRSk-JPBrYlNL0jG6m-xX/view?us
 
 ### Generate SSH:
     npm run ssl
+
+### Run project:
+    nest start
