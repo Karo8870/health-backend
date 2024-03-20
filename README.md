@@ -7,3 +7,6 @@ Video: https://drive.google.com/file/d/1T9soxuGdAG8MRSk-JPBrYlNL0jG6m-xX/view?us
 
 ### Load DB:
     npm run push
+
+### Generate SSH:
+    npm run ssl
