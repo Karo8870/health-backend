@@ -10,4 +10,5 @@ export const jwtConstants = {
 
 export const db_url = process.env.DATABASE_URL;
 
-export const ai_url = process.env.AI_URL;
+export const OPENAI_KEY = process.env.OPENAI_KEY;
+
