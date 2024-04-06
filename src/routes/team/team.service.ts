@@ -24,18 +24,21 @@ export class TeamService {
 			id: teams.id
 		});
 
-		this.db.insert(usersToTeams).values({
+		console.log(await this.db.insert(usersToTeams).values({
 			teamID: id,
 			userID: this.cls.get('userID')
-		});
+		}).returning({
+			x: usersToTeams.teamID
+		}));
 	}
 
 	findAll() {
+		console.log(this.db.query.usersToTeams.findMany({
+			where: eq(usersToTeams.userID, this.cls.get('userID'))
+		}).toSQL());
+
 		return this.db.query.usersToTeams.findMany({
-			where: eq(usersToTeams.userID, this.cls.get('userID')),
-			with: {
-				team: true
-			}
+			where: eq(usersToTeams.userID, this.cls.get('userID'))
 		});
 	}
 

@@ -38,7 +38,7 @@ export class ProfileController {
 		return this.profileService.buyPremium(buyPremiumDto);
 	}
 
-	@Post('dailyChallenge')
+	@Post('daily-challenge')
 	dailyLog() {
 		return this.profileService.dailyChallenge();
 	}
