@@ -21,4 +21,19 @@ export class CreateChallengeDto {
 	@IsString()
 	@IsNotEmpty()
 	description: string;
+
+	@ApiProperty()
+	@IsString()
+	@IsNotEmpty()
+	unit: string;
+
+	@ApiProperty()
+	@IsString()
+	@IsNotEmpty()
+	organizer: string;
+
+	@ApiProperty()
+	@IsNumber()
+	@IsNotEmpty()
+	goal: number;
 }

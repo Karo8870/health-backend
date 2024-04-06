@@ -3,7 +3,7 @@ import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../drizzle/schema';
-import { challenges } from '../../drizzle/schema';
+import { challenges, teams, users } from '../../drizzle/schema';
 import { ClsService } from 'nestjs-cls';
 import { AuthClsStore } from '../auth/auth.guard';
 import { eq } from 'drizzle-orm';
@@ -21,7 +21,10 @@ export class ChallengeService {
 			startDate: new Date(createChallengeDto.startDate),
 			endDate: new Date(createChallengeDto.endDate),
 			title: createChallengeDto.title,
-			description: createChallengeDto.description
+			description: createChallengeDto.description,
+			unit: createChallengeDto.unit,
+			goal: createChallengeDto.goal,
+			organizer: createChallengeDto.organizer
 		});
 	}
 
@@ -44,5 +47,17 @@ export class ChallengeService {
 
 	remove(id: number) {
 		return this.db.delete(challenges).where(eq(challenges.id, id));
+	}
+
+	getUsers(id: number) {
+		return this.db.select().from(teams).where(eq(teams.challengeID, id));
+	}
+
+	getGlobalUsers() {
+		return this.db.select().from(users);
+	}
+
+	getTeamUsers(id: number) {
+		return this.db.select().from(users).where(eq(teams.id, id));
 	}
 }

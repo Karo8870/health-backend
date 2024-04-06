@@ -36,4 +36,14 @@ export class ChallengeController {
 	remove(@Param('id') id: string) {
 		return this.challengeService.remove(+id);
 	}
+
+	@Get('users/:id')
+	getUsers(@Param('id') id: string) {
+		return this.challengeService.getUsers(+id);
+	}
+
+	@Get('global-users')
+	getGlobalUsers() {
+		return this.challengeService.getGlobalUsers();
+	}
 }
