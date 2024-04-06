@@ -28,7 +28,8 @@ export class AuthService {
 		private jwtService: JwtService,
 		@Inject('DB') private db: NodePgDatabase<typeof schema>,
 		private cls: ClsService<AuthClsStore>
-	) {}
+	) {
+	}
 
 	async signIn(signInDto: SignInDto): Promise<JWTTokenResponse> {
 		const user = await this.db.query.users.findFirst({
@@ -73,6 +74,8 @@ export class AuthService {
 			if (e.code === '23505') {
 				throw new ConflictException(e.detail);
 			}
+
+			console.log(e);
 
 			throw new InternalServerErrorException();
 		}

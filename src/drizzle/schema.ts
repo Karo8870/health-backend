@@ -221,7 +221,7 @@ export const challenges = pgTable('CommunityChallenge', {
 	description: text('description'),
 	goal: integer('goal'),
 	unit: varchar('unit', { length: 100 }),
-	organizer: varchar('')
+	organizer: varchar('organizer')
 });
 
 export const challengesRelations = relations(challenges, ({ many }) => ({

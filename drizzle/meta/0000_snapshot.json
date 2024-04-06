@@ -1,5 +1,5 @@
 {
-  "id": "aed94ed8-5cb5-4b4d-8330-a81dbe79c86f",
+  "id": "6f48eee7-43a6-4982-902a-60747f1f7287",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -132,6 +132,12 @@
         "unit": {
           "name": "unit",
           "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "organizer": {
+          "name": "organizer",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         }
@@ -833,6 +839,13 @@
           "primaryKey": false,
           "notNull": false,
           "default": "TO_TIMESTAMP(0)"
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
         },
         "premium": {
           "name": "premium",

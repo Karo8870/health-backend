@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS "CommunityChallenge" (
 	"title" varchar(100),
 	"description" text,
 	"goal" integer,
-	"unit" varchar(100)
+	"unit" varchar(100),
+	"organizer" varchar
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "Comment" (
@@ -119,6 +120,7 @@ CREATE TABLE IF NOT EXISTS "User" (
 	"admin" boolean DEFAULT false,
 	"points" integer DEFAULT 0,
 	"dailyChallenge" timestamp DEFAULT TO_TIMESTAMP(0),
+	"score" integer DEFAULT 0,
 	"premium" timestamp DEFAULT TO_TIMESTAMP(0),
 	CONSTRAINT "User_user_unique" UNIQUE("user"),
 	CONSTRAINT "User_email_unique" UNIQUE("email")

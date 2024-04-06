@@ -5,7 +5,7 @@ import * as schema from '../../drizzle/schema';
 import { dailyIntakes, users } from '../../drizzle/schema';
 import { ClsService } from 'nestjs-cls';
 import { AuthClsStore } from '../auth/auth.guard';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 
 @Injectable()
 export class DailyIntakeService {
@@ -16,8 +16,12 @@ export class DailyIntakeService {
 	}
 
 	async create(createDailyIntakeDto: CreateDailyIntakeDto) {
+		console.log(222);
+
+		const [x] = await this.db.select().from(dailyIntakes).where(and(eq(dailyIntakes.userID, this.cls.get('userID')), eq(dailyIntakes.date, `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`)));
+
 		const conflict: boolean = (await this.db.insert(dailyIntakes).values({
-			date: sql`CURRENT_DATE()`,
+			date: sql`TO_TIMESTAMP(0)`,
 			data: createDailyIntakeDto.data
 		}).onConflictDoUpdate({
 			target: [dailyIntakes.date, dailyIntakes.userID],
@@ -27,6 +31,8 @@ export class DailyIntakeService {
 		}).returning({
 			conflict_detected: sql`CASE WHEN (xmin = txid_current()) THEN FALSE ELSE TRUE END`
 		}))[0].conflict_detected as boolean;
+
+		console.log(333);
 
 		if (!conflict) {
 			this.db.update(users).set({
