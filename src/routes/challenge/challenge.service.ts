@@ -29,8 +29,8 @@ export class ChallengeService {
 		return this.db.select().from(challenges);
 	}
 
-	findOne(id: number) {
-		return this.db.select().from(challenges).where(eq(challenges.id, id));
+	async findOne(id: number) {
+		return (await this.db.select().from(challenges).where(eq(challenges.id, id)))[0];
 	}
 
 	update(id: number, updateChallengeDto: UpdateChallengeDto) {
