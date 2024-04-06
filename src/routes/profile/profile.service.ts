@@ -72,7 +72,9 @@ export class ProfileService {
 	}
 
 	async updateGoals(updateProfileDto: UpdateProfileDto) {
-		await this.db.update(preferences).set({
+		console.log(123)
+
+		return this.db.update(preferences).set({
 			goals: updateProfileDto.data
 		}).where(eq(preferences.userID, this.cls.get('userID')))
 			.returning({

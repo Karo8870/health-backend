@@ -44,7 +44,11 @@ export class TeamService {
 
 	findOne(id: number) {
 		return this.db.query.teams.findFirst({
-			where: and(eq(usersToTeams.teamID, id), eq(usersToTeams.userID, this.cls.get('userID')))
+			where: and(eq(usersToTeams.teamID, id), eq(usersToTeams.userID, this.cls.get('userID'))),
+			with: {
+				users: true,
+				creator: true
+			}
 		});
 	}
 

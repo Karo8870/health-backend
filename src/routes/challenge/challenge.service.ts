@@ -57,7 +57,54 @@ export class ChallengeService {
 		return this.db.select().from(users);
 	}
 
-	getTeamUsers(id: number) {
-		return this.db.select().from(users).where(eq(teams.id, id));
+	async getTeamUsers(id: number) {
+		const data = await this.db.query.teams.findFirst({
+			where: eq(teams.id, id),
+			with: {
+				users: {
+					with: {
+						user: {
+							with: {
+								dailyIntakes: {
+									columns: {
+										data: true
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+
+		console.log(JSON.stringify(data, null, 2));
+
+		const intakes = data.users.map(el => el.user.dailyIntakes) as { data: any }[][];
+
+		const sums = {
+			steps: 0,
+			kcal: 0,
+			minutes: 0
+		};
+
+		console.log(JSON.stringify(intakes, null, 2));
+
+		for (const i of intakes) {
+			for (const j of i) {
+				if (j.data.steps) {
+					sums.steps += j.data.steps;
+				}
+
+				if (j.data.kcal) {
+					sums.steps += j.data.kcal;
+				}
+
+				if (j.data.minutes) {
+					sums.steps += j.data.minutes;
+				}
+			}
+		}
+
+		return sums;
 	}
 }
