@@ -38,7 +38,16 @@ export class TeamService {
 		}).toSQL());
 
 		return this.db.query.usersToTeams.findMany({
-			where: eq(usersToTeams.userID, this.cls.get('userID'))
+			where: eq(usersToTeams.userID, this.cls.get('userID')),
+			with: {
+				team: {
+					with: {
+						users: true,
+						creator: true,
+						challenge: true
+					}
+				}
+			}
 		});
 	}
 
