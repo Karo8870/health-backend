@@ -24,7 +24,12 @@ export class ProfileService {
 				user: true,
 				email: true,
 				firstName: true,
-				lastName: true
+				lastName: true,
+				dailyChallenge: true,
+				points: true,
+				premium: true,
+				admin: true,
+				score: true
 			}
 		});
 	}
@@ -82,9 +87,11 @@ export class ProfileService {
 	}
 
 	async dailyChallenge() {
-		this.db.update(users).set({
+		console.log(await this.db.update(users).set({
 			dailyChallenge: new Date(),
 			points: sql`${users.points} + 5`
-		}).where(and(eq(users.id, this.cls.get('userID')), sql`${users.dailyChallenge} < NOW() - INTERVAL '24 hours'`));
+		}).where(and(eq(users.id, this.cls.get('userID')), sql`${users.dailyChallenge} < NOW() - INTERVAL '24 hours'`)).returning({
+			x: users.score
+		}));
 	}
 }
