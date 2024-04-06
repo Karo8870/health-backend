@@ -1,8 +1,10 @@
 import {
 	boolean,
+	date,
 	integer,
 	jsonb,
 	pgTable,
+	primaryKey,
 	serial,
 	text,
 	timestamp,
@@ -18,7 +20,10 @@ export const users = pgTable('User', {
 	user: varchar('user', { length: 30 }).unique(),
 	password: varchar('password'),
 	email: varchar('email').unique(),
-	admin: boolean('admin').default(false)
+	admin: boolean('admin').default(false),
+	points: integer('points').default(0),
+	dailyLog: boolean('dailyLog').default(false),
+	dailyChallenge: boolean('dailyChallenge').default(false)
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -33,7 +38,11 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	postReviews: many(postReviews),
 	posts: many(posts, {
 		relationName: 'ownPosts'
-	})
+	}),
+	badges: many(badgesToUsers),
+	dailyIntakes: many(dailyIntakes),
+	teams: many(usersToTeams),
+	invites: many(teamInvites)
 }));
 
 export const preferences = pgTable('Restriction', {
@@ -168,5 +177,122 @@ export const submissionRelations = relations(submissions, ({ one }) => ({
 	author: one(users, {
 		fields: [submissions.authorID],
 		references: [users.id]
+	})
+}));
+
+export const badges = pgTable('Badge', {
+	id: serial('id').primaryKey(),
+	name: varchar('name', { length: 30 })
+});
+
+export const badgesRelations = relations(badges, ({ many }) => ({
+	users: many(badgesToUsers)
+}));
+
+export const badgesToUsers = pgTable('BadgeToUser', {
+	badgeID: integer('badgeID').notNull().references(() => badges.id),
+	userID: integer('userID').notNull().references(() => users.id)
+}, (t) => ({
+	pk: primaryKey({
+		columns: [t.badgeID, t.userID]
+	})
+}));
+
+export const badgesToUsersRelations = relations(badgesToUsers, ({ one }) => ({
+	badge: one(badges, {
+		fields: [badgesToUsers.badgeID],
+		references: [badges.id]
+	}),
+	user: one(users, {
+		fields: [badgesToUsers.userID],
+		references: [users.id]
+	})
+}));
+
+export const challenges = pgTable('CommunityChallenge', {
+	id: serial('id').primaryKey(),
+	startDate: timestamp('startDate'),
+	endDate: timestamp('endDate'),
+	title: varchar('title', { length: 100 }),
+	description: text('description')
+});
+
+export const challengesRelations = relations(challenges, ({ many }) => ({
+	teams: many(teams)
+}));
+
+export const redeems = pgTable('Redeem', {
+	id: serial('id').primaryKey(),
+	title: varchar('title', { length: 100 }),
+	description: text('description'),
+	points: integer('points').default(0)
+});
+
+export const dailyIntakes = pgTable('DailyIntake', {
+	id: serial('id').primaryKey(),
+	userID: integer('userID'),
+	date: date('date'),
+	data: jsonb('data')
+});
+
+export const dailyIntakesRelations = relations(dailyIntakes, ({ one }) => ({
+	user: one(users, {
+		fields: [dailyIntakes.userID],
+		references: [users.id]
+	})
+}));
+
+export const teams = pgTable('Teams', {
+	id: serial('id').primaryKey(),
+	title: varchar('title', { length: 100 }),
+	challengeID: integer('challengeID').references(() => challenges.id)
+});
+
+export const teamsRelations = relations(teams, ({ one, many }) => ({
+	users: many(usersToTeams),
+	invites: many(teamInvites),
+	challenge: one(challenges, {
+		fields: [teams.challengeID],
+		references: [challenges.id]
+	})
+}));
+
+export const usersToTeams = pgTable('UserToTeam', {
+	userID: integer('userID').references(() => users.id),
+	teamID: integer('teamID').references(() => teams.id)
+}, (t) => ({
+	pk: primaryKey({
+		columns: [t.userID, t.teamID]
+	})
+}));
+
+export const usersToTeamsRelations = relations(usersToTeams, ({ one }) => ({
+	team: one(teams, {
+		fields: [usersToTeams.teamID],
+		references: [teams.id]
+	}),
+	user: one(users, {
+		fields: [usersToTeams.userID],
+		references: [users.id]
+	})
+}));
+
+export const teamInvites = pgTable('TeamInvite', {
+	teamID: integer('teamID').references(() => teams.id),
+	userID: integer('userID').references(() => users.id)
+}, (t) => ({
+	pk: primaryKey({
+		columns: [t.userID, t.teamID]
+	})
+}));
+
+export const teamInvitesRelations = relations(teamInvites, ({ one }) => ({
+	user: one(users, {
+		fields: [teamInvites.userID],
+		references: [users.id]
+	}),
+	team: one(teams, {
+		fields: [teamInvites.teamID],
+		references: [teams.id]
 	})
 }));

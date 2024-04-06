@@ -12,6 +12,12 @@ import { SubmissionModule } from './routes/submission/submission.module';
 import { db_url } from './core/constants';
 import { CommentModule } from './routes/comment/comment.module';
 import { AiModule } from './routes/ai/ai.module';
+import { BadgeModule } from './routes/badge/badge.module';
+import { ChallengeModule } from './routes/challenge/challenge.module';
+import { RedeemModule } from './routes/redeem/redeem.module';
+import { DailyIntakeModule } from './routes/daily-intake/daily-intake.module';
+import { TeamModule } from './routes/team/team.module';
+import { TeamInviteModule } from './routes/team-invite/team-invite.module';
 
 @Module({
 	imports: [
@@ -37,7 +43,13 @@ import { AiModule } from './routes/ai/ai.module';
 		PostModule,
 		SubmissionModule,
 		CommentModule,
-		AiModule
+		AiModule,
+		BadgeModule,
+		ChallengeModule,
+		RedeemModule,
+		DailyIntakeModule,
+		TeamModule,
+		TeamInviteModule
 	],
 	providers: [
 		{
