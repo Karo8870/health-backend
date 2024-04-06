@@ -34,7 +34,8 @@ export class ProfileService {
 			await this.db
 				.select({
 					data: preferences.data,
-					personal: preferences.personal
+					personal: preferences.personal,
+					goals: preferences.goals
 				})
 				.from(preferences)
 				.where(eq(preferences.userID, this.cls.get('userID')))

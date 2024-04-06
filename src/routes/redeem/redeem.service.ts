@@ -1,26 +1,44 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateRedeemDto } from './dto/create-redeem.dto';
 import { UpdateRedeemDto } from './dto/update-redeem.dto';
+import { ClsService } from 'nestjs-cls';
+import { AuthClsStore } from '../auth/auth.guard';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../../drizzle/schema';
+import { redeems } from '../../drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class RedeemService {
-  create(createRedeemDto: CreateRedeemDto) {
-    return 'This action adds a new redeem';
-  }
+	constructor(
+		@Inject('DB') private db: NodePgDatabase<typeof schema>,
+		private cls: ClsService<AuthClsStore>
+	) {
+	}
 
-  findAll() {
-    return `This action returns all redeem`;
-  }
+	create(createRedeemDto: CreateRedeemDto) {
+		return this.db.insert(redeems).values({
+			title: createRedeemDto.title,
+			description: createRedeemDto.description
+		});
+	}
 
-  findOne(id: number) {
-    return `This action returns a #${id} redeem`;
-  }
+	findAll() {
+		return this.db.select().from(redeems);
+	}
 
-  update(id: number, updateRedeemDto: UpdateRedeemDto) {
-    return `This action updates a #${id} redeem`;
-  }
+	findOne(id: number) {
+		return this.db.select().from(redeems).where(eq(redeems.id, id));
+	}
 
-  remove(id: number) {
-    return `This action removes a #${id} redeem`;
-  }
+	update(id: number, updateRedeemDto: UpdateRedeemDto) {
+		return this.db.update(redeems).set({
+			title: updateRedeemDto.title,
+			description: updateRedeemDto.description
+		}).where(eq(redeems.id, id));
+	}
+
+	remove(id: number) {
+		return this.db.delete(redeems).where(eq(redeems.id, id));
+	}
 }

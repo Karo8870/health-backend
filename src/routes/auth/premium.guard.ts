@@ -19,6 +19,8 @@ export class PremiumGuard implements CanActivate {
 			where: eq(users.id, this.cls.get('userID'))
 		});
 
+		console.log(account);
+
 		return account.premium.getTime() > new Date().getTime();
 	}
 }

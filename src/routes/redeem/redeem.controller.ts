@@ -1,34 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { RedeemService } from './redeem.service';
 import { CreateRedeemDto } from './dto/create-redeem.dto';
 import { UpdateRedeemDto } from './dto/update-redeem.dto';
+import { AdminGuard } from '../auth/admin.guard';
 
 @Controller('redeem')
 export class RedeemController {
-  constructor(private readonly redeemService: RedeemService) {}
+	constructor(private readonly redeemService: RedeemService) {
+	}
 
-  @Post()
-  create(@Body() createRedeemDto: CreateRedeemDto) {
-    return this.redeemService.create(createRedeemDto);
-  }
+	@UseGuards(AdminGuard)
+	@Post()
+	create(@Body() createRedeemDto: CreateRedeemDto) {
+		return this.redeemService.create(createRedeemDto);
+	}
 
-  @Get()
-  findAll() {
-    return this.redeemService.findAll();
-  }
+	@Get()
+	findAll() {
+		return this.redeemService.findAll();
+	}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.redeemService.findOne(+id);
-  }
+	@Get(':id')
+	findOne(@Param('id') id: string) {
+		return this.redeemService.findOne(+id);
+	}
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRedeemDto: UpdateRedeemDto) {
-    return this.redeemService.update(+id, updateRedeemDto);
-  }
+	@UseGuards(AdminGuard)
+	@Patch(':id')
+	update(@Param('id') id: string, @Body() updateRedeemDto: UpdateRedeemDto) {
+		return this.redeemService.update(+id, updateRedeemDto);
+	}
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.redeemService.remove(+id);
-  }
+	@UseGuards(AdminGuard)
+	@Delete(':id')
+	remove(@Param('id') id: string) {
+		return this.redeemService.remove(+id);
+	}
+
+	@Patch('redeem')
+	redeem() {
+
+	}
 }
