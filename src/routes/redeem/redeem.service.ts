@@ -5,8 +5,8 @@ import { ClsService } from 'nestjs-cls';
 import { AuthClsStore } from '../auth/auth.guard';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../drizzle/schema';
-import { redeems } from '../../drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { redeems, users } from '../../drizzle/schema';
+import { eq, sql } from 'drizzle-orm';
 import { PayRedeemDto } from './dto/pay-redeem.dto';
 
 @Injectable()
@@ -43,7 +43,17 @@ export class RedeemService {
 		return this.db.delete(redeems).where(eq(redeems.id, id));
 	}
 
-	redeem(payRedeemDto: PayRedeemDto) {
+	async redeem(payRedeemDto: PayRedeemDto) {
+		console.log(await this.db.update(users).set({
+			points: sql`${users.points} - 5`
+		}).where(eq(users.id, this.cls.get('userID'))).returning({
+			p: users.points
+		}));
 
+		console.log(await this.db.update(redeems).set({
+			points: sql`${redeems.points} + 5`
+		}).where(eq(redeems.id, payRedeemDto.causeID)).returning({
+			p: redeems.points
+		}));
 	}
 }
