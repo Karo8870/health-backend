@@ -16,4 +16,9 @@ export class CreateRedeemDto {
 	@IsNumber()
 	@IsNotEmpty()
 	cost: number;
+
+	@ApiProperty()
+	@IsString()
+	@IsNotEmpty()
+	reward: string;
 }

@@ -20,7 +20,9 @@ export class RedeemService {
 	create(createRedeemDto: CreateRedeemDto) {
 		return this.db.insert(redeems).values({
 			title: createRedeemDto.title,
-			description: createRedeemDto.description
+			description: createRedeemDto.description,
+			cost: createRedeemDto.cost,
+			reward: createRedeemDto.reward
 		});
 	}
 
