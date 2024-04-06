@@ -1,34 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { BadgeService } from './badge.service';
-import { CreateBadgeDto } from './dto/create-badge.dto';
 import { UpdateBadgeDto } from './dto/update-badge.dto';
+import { GetBadgeDdo } from './dto/get-badge.tdo';
+import { CreateBadgeDto } from './dto/create-badge.dto';
+import { AdminGuard } from '../auth/admin.guard';
 
 @Controller('badge')
 export class BadgeController {
-  constructor(private readonly badgeService: BadgeService) {}
+	constructor(private readonly badgeService: BadgeService) {
+	}
 
-  @Post()
-  create(@Body() createBadgeDto: CreateBadgeDto) {
-    return this.badgeService.create(createBadgeDto);
-  }
+	@UseGuards(AdminGuard)
+	@Post()
+	create(@Body() createBadgeDto: CreateBadgeDto) {
+		return this.badgeService.create(createBadgeDto);
+	}
 
-  @Get()
-  findAll() {
-    return this.badgeService.findAll();
-  }
+	@Post('get')
+	getBadge(@Body() getBadgeDto: GetBadgeDdo) {
+		return this.badgeService.getBadge(getBadgeDto);
+	}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.badgeService.findOne(+id);
-  }
+	@Get()
+	findAll() {
+		return this.badgeService.findAll();
+	}
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBadgeDto: UpdateBadgeDto) {
-    return this.badgeService.update(+id, updateBadgeDto);
-  }
+	@Get(':id')
+	findOne(@Param('id') id: string) {
+		return this.badgeService.findOne(+id);
+	}
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.badgeService.remove(+id);
-  }
+	@UseGuards(AdminGuard)
+	@Patch(':id')
+	update(@Param('id') id: string, @Body() updateBadgeDto: UpdateBadgeDto) {
+		return this.badgeService.update(+id, updateBadgeDto);
+	}
+
+	@UseGuards(AdminGuard)
+	@Delete(':id')
+	remove(@Param('id') id: string) {
+		return this.badgeService.remove(+id);
+	}
 }

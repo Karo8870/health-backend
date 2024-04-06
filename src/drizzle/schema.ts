@@ -11,7 +11,7 @@ import {
 	unique,
 	varchar
 } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 
 export const users = pgTable('User', {
 	id: serial('id').primaryKey(),
@@ -22,8 +22,8 @@ export const users = pgTable('User', {
 	email: varchar('email').unique(),
 	admin: boolean('admin').default(false),
 	points: integer('points').default(0),
-	dailyLog: boolean('dailyLog').default(false),
-	dailyChallenge: boolean('dailyChallenge').default(false)
+	dailyChallenge: timestamp('dailyChallenge').default(sql`TO_TIMESTAMP(0)`),
+	premium: timestamp('premium').default(sql`TO_TIMESTAMP(0)`)
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -42,14 +42,16 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	badges: many(badgesToUsers),
 	dailyIntakes: many(dailyIntakes),
 	teams: many(usersToTeams),
-	invites: many(teamInvites)
+	invites: many(teamInvites),
+	teamsOwner: many(teams)
 }));
 
 export const preferences = pgTable('Restriction', {
 	id: serial('id').primaryKey(),
 	userID: integer('userID').references(() => users.id, { onDelete: 'cascade' }),
 	data: jsonb('data'),
-	personal: jsonb('personal')
+	personal: jsonb('personal'),
+	goals: jsonb('goals')
 });
 
 export const productDetails = pgTable('ProductDetails', {
@@ -182,7 +184,8 @@ export const submissionRelations = relations(submissions, ({ one }) => ({
 
 export const badges = pgTable('Badge', {
 	id: serial('id').primaryKey(),
-	name: varchar('name', { length: 30 })
+	name: varchar('name', { length: 30 }),
+	description: text('description')
 });
 
 export const badgesRelations = relations(badges, ({ many }) => ({
@@ -214,7 +217,9 @@ export const challenges = pgTable('CommunityChallenge', {
 	startDate: timestamp('startDate'),
 	endDate: timestamp('endDate'),
 	title: varchar('title', { length: 100 }),
-	description: text('description')
+	description: text('description'),
+	goal: integer('goal'),
+	unit: varchar('unit', { length: 100 })
 });
 
 export const challengesRelations = relations(challenges, ({ many }) => ({
@@ -229,11 +234,14 @@ export const redeems = pgTable('Redeem', {
 });
 
 export const dailyIntakes = pgTable('DailyIntake', {
-	id: serial('id').primaryKey(),
 	userID: integer('userID'),
 	date: date('date'),
 	data: jsonb('data')
-});
+}, (t) => ({
+	pk: primaryKey({
+		columns: [t.date, t.userID]
+	})
+}));
 
 export const dailyIntakesRelations = relations(dailyIntakes, ({ one }) => ({
 	user: one(users, {
@@ -245,7 +253,8 @@ export const dailyIntakesRelations = relations(dailyIntakes, ({ one }) => ({
 export const teams = pgTable('Teams', {
 	id: serial('id').primaryKey(),
 	title: varchar('title', { length: 100 }),
-	challengeID: integer('challengeID').references(() => challenges.id)
+	challengeID: integer('challengeID').references(() => challenges.id),
+	creatorID: integer('creatorID').references(() => users.id)
 });
 
 export const teamsRelations = relations(teams, ({ one, many }) => ({
@@ -254,6 +263,10 @@ export const teamsRelations = relations(teams, ({ one, many }) => ({
 	challenge: one(challenges, {
 		fields: [teams.challengeID],
 		references: [challenges.id]
+	}),
+	creator: one(users, {
+		fields: [teams.creatorID],
+		references: [users.id]
 	})
 }));
 
