@@ -16,28 +16,32 @@ export class DailyIntakeService {
 	}
 
 	async create(createDailyIntakeDto: CreateDailyIntakeDto) {
-		console.log(222);
+		const [x] = await this.db.select().from(dailyIntakes).where(and(eq(dailyIntakes.userID, this.cls.get('userID')), eq(dailyIntakes.date, `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`)));
 
-		const [x] = await this.db.select().from(dailyIntakes).where(and(eq(dailyIntakes.userID, this.cls.get('userID')), eq(dailyIntakes.date, `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`)));
+		const d = `${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}-${new Date().getDate().toString().padStart(2, '0')}`;
 
-		const conflict: boolean = (await this.db.insert(dailyIntakes).values({
-			date: sql`TO_TIMESTAMP(0)`,
+		console.log(this.db.update(dailyIntakes).set({
 			data: createDailyIntakeDto.data
-		}).onConflictDoUpdate({
-			target: [dailyIntakes.date, dailyIntakes.userID],
-			set: {
-				data: createDailyIntakeDto.data
-			}
-		}).returning({
-			conflict_detected: sql`CASE WHEN (xmin = txid_current()) THEN FALSE ELSE TRUE END`
-		}))[0].conflict_detected as boolean;
+		}).where(and(eq(dailyIntakes.userID, this.cls.get('userID')), eq(dailyIntakes.date, d))).toSQL());
 
-		console.log(333);
+		if (!x) {
+			await this.db.insert(dailyIntakes).values({
+				date: sql`NOW()`,
+				data: createDailyIntakeDto.data,
+				userID: this.cls.get('userID')
+			});
 
-		if (!conflict) {
-			this.db.update(users).set({
+			console.log(await this.db.update(users).set({
 				points: sql`${users.points} + 5`
-			}).where(eq(users.id, this.cls.get('userID')));
+			}).where(eq(users.id, this.cls.get('userID'))).returning({
+				x: users.id
+			}));
+		} else {
+			console.log(await this.db.update(dailyIntakes).set({
+				data: createDailyIntakeDto.data
+			}).where(and(eq(dailyIntakes.userID, this.cls.get('userID')))).returning({
+				x: dailyIntakes.data
+			}));
 		}
 	}
 

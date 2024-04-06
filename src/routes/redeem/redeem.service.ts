@@ -7,6 +7,7 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../../drizzle/schema';
 import { redeems } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
+import { PayRedeemDto } from './dto/pay-redeem.dto';
 
 @Injectable()
 export class RedeemService {
@@ -40,5 +41,9 @@ export class RedeemService {
 
 	remove(id: number) {
 		return this.db.delete(redeems).where(eq(redeems.id, id));
+	}
+
+	redeem(payRedeemDto: PayRedeemDto) {
+
 	}
 }

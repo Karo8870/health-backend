@@ -3,6 +3,7 @@ import { RedeemService } from './redeem.service';
 import { CreateRedeemDto } from './dto/create-redeem.dto';
 import { UpdateRedeemDto } from './dto/update-redeem.dto';
 import { AdminGuard } from '../auth/admin.guard';
+import { PayRedeemDto } from './dto/pay-redeem.dto';
 
 @Controller('redeem')
 export class RedeemController {
@@ -38,7 +39,7 @@ export class RedeemController {
 	}
 
 	@Patch('redeem')
-	redeem() {
-
+	redeem(@Body() payRedeemDto: PayRedeemDto) {
+		return this.redeemService.redeem(payRedeemDto);
 	}
 }

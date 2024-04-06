@@ -232,7 +232,9 @@ export const redeems = pgTable('Redeem', {
 	id: serial('id').primaryKey(),
 	title: varchar('title', { length: 100 }),
 	description: text('description'),
-	points: integer('points').default(0)
+	points: integer('points').default(0),
+	cost: integer('cost'),
+	reward: text('reward')
 });
 
 export const dailyIntakes = pgTable('DailyIntake', {
