@@ -38,7 +38,7 @@ export class BadgeService {
 	}
 
 	async findOne(id: number) {
-		return this.db.select().from(badges).where(eq(badges.id, id));
+		return (await this.db.select().from(badges).where(eq(badges.id, id)))[0];
 	}
 
 	update(id: number, updateBadgeDto: UpdateBadgeDto) {
