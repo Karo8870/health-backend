@@ -5,5 +5,5 @@ export class CreateDailyIntakeDto {
 	@ApiProperty()
 	@IsString()
 	@IsNotEmpty()
-	data: string;
+	data: any;
 }

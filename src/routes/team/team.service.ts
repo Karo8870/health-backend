@@ -16,10 +16,17 @@ export class TeamService {
 	) {
 	}
 
-	create(createTeamDto: CreateTeamDto) {
-		return this.db.insert(teams).values({
+	async create(createTeamDto: CreateTeamDto) {
+		const [{ id }] = await this.db.insert(teams).values({
 			title: createTeamDto.title,
 			challengeID: createTeamDto.challengeID
+		}).returning({
+			id: teams.id
+		});
+
+		this.db.insert(usersToTeams).values({
+			teamID: id,
+			userID: this.cls.get('userID')
 		});
 	}
 

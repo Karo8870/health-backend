@@ -1,26 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateTeamInviteDto } from './dto/create-team-invite.dto';
-import { UpdateTeamInviteDto } from './dto/update-team-invite.dto';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../../drizzle/schema';
+import { teamInvites, usersToTeams } from '../../drizzle/schema';
+import { ClsService } from 'nestjs-cls';
+import { AuthClsStore } from '../auth/auth.guard';
+import { and, eq } from 'drizzle-orm';
 
 @Injectable()
 export class TeamInviteService {
-  create(createTeamInviteDto: CreateTeamInviteDto) {
-    return 'This action adds a new teamInvite';
-  }
+	constructor(
+		@Inject('DB') private db: NodePgDatabase<typeof schema>,
+		private cls: ClsService<AuthClsStore>
+	) {
+	}
 
-  findAll() {
-    return `This action returns all teamInvite`;
-  }
+	create(createTeamInviteDto: CreateTeamInviteDto) {
+		return this.db.insert(teamInvites).values({
+			teamID: createTeamInviteDto.teamID,
+			userID: createTeamInviteDto.userID
+		});
+	}
 
-  findOne(id: number) {
-    return `This action returns a #${id} teamInvite`;
-  }
+	findAll() {
+		return this.db.select().from(teamInvites).where(eq(teamInvites.userID, this.cls.get('userID')));
+	}
 
-  update(id: number, updateTeamInviteDto: UpdateTeamInviteDto) {
-    return `This action updates a #${id} teamInvite`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} teamInvite`;
-  }
+	remove(teamID: number, userID: number) {
+		return this.db.delete(teamInvites).where(and(eq(teamInvites.teamID, teamID), eq(teamInvites.userID, userID)));
+	}
 }

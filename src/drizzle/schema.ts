@@ -23,6 +23,7 @@ export const users = pgTable('User', {
 	admin: boolean('admin').default(false),
 	points: integer('points').default(0),
 	dailyChallenge: timestamp('dailyChallenge').default(sql`TO_TIMESTAMP(0)`),
+	score: integer('score').default(0),
 	premium: timestamp('premium').default(sql`TO_TIMESTAMP(0)`)
 });
 
@@ -219,7 +220,8 @@ export const challenges = pgTable('CommunityChallenge', {
 	title: varchar('title', { length: 100 }),
 	description: text('description'),
 	goal: integer('goal'),
-	unit: varchar('unit', { length: 100 })
+	unit: varchar('unit', { length: 100 }),
+	organizer: varchar('')
 });
 
 export const challengesRelations = relations(challenges, ({ many }) => ({
