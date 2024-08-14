@@ -26,7 +26,11 @@ import { TeamInviteModule } from './routes/team-invite/team-invite.module';
 			pg: {
 				connection: 'client',
 				config: {
-					connectionString: db_url
+					user: 'postgres.zqxqbceqanuyqniwjtqs',
+					password: 'ehWMvfPT#7JKdXg',
+					host: 'aws-0-eu-central-1.pooler.supabase.com',
+					port: 6543,
+					database: 'postgres'
 				}
 			},
 			config: { schema: { ...schema } }

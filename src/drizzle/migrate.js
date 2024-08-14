@@ -5,8 +5,14 @@ const { config } = require('dotenv');
 
 config();
 
+console.log(process.env.DATABASE_URL);
+
 const pool = new Pool({
-	connectionString: process.env.DATABASE_URL
+	user: 'postgres.zqxqbceqanuyqniwjtqs',
+	password: 'ehWMvfPT#7JKdXg',
+	host: 'aws-0-eu-central-1.pooler.supabase.com',
+	port: 6543,
+	database: 'postgres'
 });
 
 const db = drizzle(pool);
